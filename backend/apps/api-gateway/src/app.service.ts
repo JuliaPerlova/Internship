@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ClientProxy, Transport, ClientProxyFactory } from '@nestjs/microservices';
-import { MailServiceService } from '../../mail-service/src/mail-service.service';
+import { TokenService } from '../../token-service/src/token.service';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -8,7 +8,7 @@ export class AppService {
   private authClient: ClientProxy;
   private userClient: ClientProxy;
 
-  constructor(private readonly mailService: MailServiceService) {
+  constructor(private readonly tokenService: TokenService) {
     this.authClient = ClientProxyFactory.create({ 
       transport: Transport.TCP, 
       options: {
@@ -37,8 +37,8 @@ export class AppService {
     return this.authClient.send<object>({ cmd: 'sign up' }, data);
   }
 
-  forgotPass(data: object) {
-    return this.authClient.send<object>({ cmd: 'forgot password' }, data);
+  forgotPass(email) {
+    return this.authClient.send<object>({ cmd: 'forgot password' }, email);
   }
 
   changePass(data: object) {
@@ -69,7 +69,7 @@ export class AppService {
     return this.userClient.send<string>({ cmd: 'deleteUser' }, id);
   }
 
-  async sendMail({ id, email, token }) {
-    return await this.mailService.changePass(id, email, token);
+  deleteToken(id: string) {
+    return this.tokenService.deleteAll(id);
   }
 }

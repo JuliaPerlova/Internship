@@ -1,20 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { createTransport } from 'nodemailer';
+import 'dotenv/config';
 
 @Injectable()
 export class MailServiceService {
     private static transporter = createTransport({
         service: 'gmail',
         auth: {
-            user: 'user@gmail.com',
-            pass: 'userpass',
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
         }
     })
 
     async confirmEmail(email: string, id: string, token: string) {
         const link = `http://localhost:3000/auth/${id}/confirmation/token=${token}`;
         return await MailServiceService.transporter.sendMail({
-            from: 'user@gmail.com',
+            from: process.env.EMAIL,
             to: email,
             subject: 'Verificate your email',
             html: `<h3>We are glad to see you in our community!</h3> 
@@ -24,15 +25,15 @@ export class MailServiceService {
     }
 
     async changePass(email: string, id: string, token: string) {
-        const link = `http://localhost:3000/${id}/forgot/token=${token}`;
+        const link = `http://localhost:3000/auth/${id}/forgot/token=${token}`;
         return await MailServiceService.transporter.sendMail({
-            from: 'user@gmail.com',
+            from: process.env.EMAIL,
             to: email,
             subject: 'Change password request',
             html: `<h3>Forgot your password? It's not a problem for sure!</h3> 
                    <p>Please click on this link ${link} to change your password. Hurry up! This link will be available for one day. </p><br>
                    <p>If you didnt send this requst, we recommend that you contact our support</p>`
-        });
+        }).then(() => console.log('success!')).catch((err) => console.log(err));
     }
 
 }

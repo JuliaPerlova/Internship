@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, Req, } from '@nestjs/common';
 import { Request } from 'express';
 
 import { AppService } from './app.service';
@@ -23,13 +23,15 @@ export class AppController {
   }
 
   @Post('/auth/forgot')
-  forgotPass(@Body() data: object) {
-    return this.appService.forgotPass(data);
+  forgotPass(@Body() { email }) {
+    return this.appService.forgotPass(email);
   }
 
   @Post('/auth/:id/forgot/token=:token')
-  changePass(@Param('id') id: string, @Body() { password }) {
-    return this.appService.changePass({ id, password });
+  changePass(
+    @Req() req: Request, 
+    @Body() { password }) {
+    return this.appService.changePass({ ...req.params, ...req.query, password });
   }
 
   @Get('/auth/:id/confirmation/token=:token')
@@ -61,5 +63,11 @@ export class AppController {
   deleteUser(@Param('id') id: string) {
     return this.appService.deleteUser(id);
   }
+
+  @Get(':id/logout')
+  deleteToken(@Param('id') id: string) {
+    return this.appService.deleteToken(id);
+  }
+
 
 }

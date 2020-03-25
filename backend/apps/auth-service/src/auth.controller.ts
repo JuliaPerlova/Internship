@@ -12,7 +12,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @MessagePattern({ cmd: 'login'})
-  async login({ email, password }: LoginDto): Promise<boolean> {
+  async login({ email, password }: LoginDto): Promise<string> {
       return await this.authService.signIn({ email, password });
   }
 
@@ -27,8 +27,8 @@ export class AuthController {
   }
 
   @MessagePattern({ cmd: 'change password' })
-  async changePass({ id, password }) {
-    return await this.authService.changePass(id, password);
+  async changePass({ id, token, password }): Promise<boolean> {
+    return await this.authService.changePass(id, token, password);
   }
 
   @MessagePattern({cmd: 'confirmation'})

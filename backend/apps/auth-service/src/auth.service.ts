@@ -24,7 +24,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) {}
     
-    async mailSend(email: string, message: string, token: string, id: string) {
+    private async mailSend(email: string, message: string, token: string, id: string) {
         const user = this.userService.findUserByEmail(email);
 
         if(!user) {
@@ -35,7 +35,7 @@ export class AuthService {
             case 'New User': 
                 await this.mailService.confirmEmail(email, id, token,);
                 break;
-            case 'Forgot password':
+            case 'Forgot Password':
                 await this.mailService.changePass(email, id, token);
                 break;
         }
@@ -53,6 +53,11 @@ export class AuthService {
 
     private async createToken(createUserTokenDto: CreateUserTokenDto) {
         return await this.tokenService.create(createUserTokenDto);
+    }
+
+    private async hashPass(password: string) {
+        const salt = await bcrypt.genSalt(10);
+        return await bcrypt.hash(password, salt);
     }
 
 
@@ -81,14 +86,13 @@ export class AuthService {
             expiredAt,
         });
         
-        return true;
+        return token;
     }
 
     async signUp(createUserDto: CreateUserDto) {
         const pass = createUserDto.password;
 
-        const salt = await bcrypt.genSalt(10);
-        const password = await bcrypt.hash(pass, salt);
+        const password = await this.hashPass(pass);
         const saltUser = { ...createUserDto, password };
         const user = await this.userService.createUser(
             saltUser,
@@ -121,14 +125,32 @@ export class AuthService {
         }
 
         const expiresIn = 60 * 60 * 24;
+
         const token = this.accessToken(user, { expiresIn });
-        await this.mailSend(email, 'Forgot Password', user._id, token);
+
+        const expiredAt = addDays(Date.now(), 1);
+
+        await this.mailSend(email, 'Forgot Password', token, user._id);
+        await this.createToken({
+            token,
+            uId: user._id,
+            expiredAt,
+        });
+
         return true;
     }
 
-    async changePass(userId: string, password: string) {
+    async changePass(userId: string, token: string, pass: string) {
+        const check = await this.tokenService.exists(userId, token);
+        if (!check) {
+            throw new ForbiddenException();
+        }
+
         await this.tokenService.deleteAll(userId);
-        await this.userService.updateUser(userId, password);
+
+        const password = await this.hashPass(pass); 
+        await this.userService.updateUser(userId, { password });
+
         return true;
     }
 
