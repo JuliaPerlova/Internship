@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../../user-service/src/user.module';
 import { TokenModule } from '../../token-service/src/token.module';
 
-import { MailServiceModule } from '../../mail-service/src/mail-service.module';
+import { MailServiceModule } from '../../shared/mail-service/src/mail-service.module';
 import { jwtConstants } from './constants/constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './auth.controller';

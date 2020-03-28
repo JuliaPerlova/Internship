@@ -1,7 +1,10 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Req, } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, Req, UseFilters, } from '@nestjs/common';
 import { Request } from 'express';
 
 import { AppService } from './app.service';
+
+import { HttpExceptionFilter } from '../../shared/filters/src/http-exception.filter';
+import { ExceptionFilter } from '../../shared/filters/src/rpc-exception.filter';
 
 @Controller()
 export class AppController {
@@ -25,6 +28,11 @@ export class AppController {
   @Post('/auth/forgot')
   forgotPass(@Body() { email }) {
     return this.appService.forgotPass(email);
+  }
+
+  @Get('/auth/:id/forgot/token=:token')
+  checkToken(@Req() req: Request) {
+    return this.appService.checkToken({ ...req.params, ...req.query });
   }
 
   @Post('/auth/:id/forgot/token=:token')
@@ -64,10 +72,9 @@ export class AppController {
     return this.appService.deleteUser(id);
   }
 
-  @Get(':id/logout')
-  deleteToken(@Param('id') id: string) {
-    return this.appService.deleteToken(id);
+  @Get(':id/token=:token/logout')
+  logout(@Req() req: Request) {
+    return this.appService.logout({ ...req.params, ...req.query });
   }
-
 
 }

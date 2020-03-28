@@ -46,29 +46,29 @@
     },
     "mail-service": {
       "type": "application",
-      "root": "apps/mail-service/src",
+      "root": "apps/shared/mail-service/src",
       "entryFile": "main",
-      "sourceRoot": "apps/mail-service/src",
+      "sourceRoot": "apps/shared/mail-service/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/mail-service/tsconfig.app.json"
+        "tsConfigPath": "apps/shared/mail-service/tsconfig.app.json"
       }
     },
     "database": {
       "type": "application",
-      "root": "apps/database/src",
+      "root": "apps/shared/database/src",
       "entryFile": "main",
-      "sourceRoot": "apps/database/src",
+      "sourceRoot": "apps/shared/database/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/database/tsconfig.app.json"
+        "tsConfigPath": "apps/shared/database/tsconfig.app.json"
       }
     },
-    "common": {
+    "posts": {
       "type": "application",
-      "root": "apps/common",
+      "root": "apps/posts",
       "entryFile": "main",
-      "sourceRoot": "apps/common/src",
+      "sourceRoot": "apps/posts/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/common/tsconfig.app.json"
+        "tsConfigPath": "apps/posts/tsconfig.app.json"
       }
     }
   }

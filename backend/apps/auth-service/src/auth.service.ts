@@ -1,11 +1,13 @@
-import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
+
 import * as bcrypt from 'bcrypt';
-import { addDays } from 'date-fns';
+import { addDays, compareAsc } from 'date-fns';
 
 import { UserService } from '../../user-service/src/user.service';
 import { TokenService } from '../../token-service/src/token.service';
-import { MailServiceService } from '../../mail-service/src//mail-service.service';
+import { MailServiceService } from '../../shared/mail-service/src//mail-service.service';
 
 import { CreateUserDto } from '../../user-service/src/dto/create-user.dto';
 import { CreateUserTokenDto } from '../../token-service/src/dto/create-user-token.dto';
@@ -14,6 +16,7 @@ import { statusEnum } from '../../user-service/src/enums/status.enum';
 import { rolesEnum } from '../../user-service/src/enums/roles.enum';
 
 import { LoginDto } from './dto/login.dto';
+
 
 @Injectable()
 export class AuthService {
@@ -65,28 +68,27 @@ export class AuthService {
         const user = await this.userService.findUserByEmail(email);
 
         if (!user) {
-            throw new UnauthorizedException();
+            throw new RpcException('User was not found');
         }
 
         if (!(await bcrypt.compare(password, user.password))) {
-            throw new ForbiddenException();
+            throw new RpcException('Password is not correct');
         }
 
         if(user.status !== statusEnum.active) {
-            throw new ForbiddenException();
+            throw new RpcException('Confirm your email');
         }
 
         const token = this.accessToken(user);
 
         const expiredAt = addDays(Date.now(), 1);
 
-        await this.createToken({
+        return await this.createToken({
             token,
             uId: user._id,
             expiredAt,
         });
         
-        return token;
     }
 
     async signUp(createUserDto: CreateUserDto) {
@@ -121,7 +123,7 @@ export class AuthService {
         const user = await this.userService.findUserByEmail(email);
 
         if (!user) {
-            throw new UnauthorizedException();
+            throw new RpcException('User was not found');
         }
 
         const expiresIn = 60 * 60 * 24;
@@ -140,12 +142,19 @@ export class AuthService {
         return true;
     }
 
-    async changePass(userId: string, token: string, pass: string) {
-        const check = await this.tokenService.exists(userId, token);
-        if (!check) {
-            throw new ForbiddenException();
+    async checkToken(userId: string, token: string) {
+        const foundToken = await this.tokenService.find(userId, token);
+        const data = new Date();
+
+        if(!foundToken || compareAsc(foundToken.expiredAt, data) !== 1 ) {
+            await this.tokenService.delete(userId, token);
+            throw new RpcException('This link has expired')
         }
 
+        return true;
+    }
+
+    async changePass(userId: string, token: string, pass: string) {
         await this.tokenService.deleteAll(userId);
 
         const password = await this.hashPass(pass); 
@@ -155,12 +164,18 @@ export class AuthService {
     }
 
     async confirmEmail(userId, token) {
-        const check = await this.tokenService.exists(userId, token);
-        if (!check) {
-            throw new ForbiddenException();
+        const check = this.checkToken(userId, token);
+
+        if (check) {
+            await this.userService.updateUser(userId, { status: 'active' });
+            await this.tokenService.delete(userId, token);
+            return true;
         }
 
-        await this.userService.updateUser(userId, { status: 'active' });
+    }
+
+    async logout(userId, token) {
+        await this.tokenService.delete(userId, token);
         return true;
     }
 

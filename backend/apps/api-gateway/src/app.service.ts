@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ClientProxy, Transport, ClientProxyFactory } from '@nestjs/microservices';
 
-import { TokenService } from '../../token-service/src/token.service';
-
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -10,7 +8,7 @@ export class AppService {
   private authClient: ClientProxy;
   private userClient: ClientProxy;
 
-  constructor(private readonly tokenService: TokenService) {
+  constructor() {
     this.authClient = ClientProxyFactory.create({ 
       transport: Transport.TCP, 
       options: {
@@ -33,15 +31,19 @@ export class AppService {
   }
 
   login(data: object) {
-    return this.authClient.send<object>({ cmd: 'login' }, data);
+    return this.authClient.send<object>({ cmd: 'login' }, data).toPromise().catch((err) => err);
   }
 
   signUp(data: object) {
-    return this.authClient.send<object>({ cmd: 'sign up' }, data);
+    return this.authClient.send<object>({ cmd: 'sign up' }, data).toPromise().catch((err) => err);
+  }
+
+  checkToken(data: object) {
+    return this.authClient.send<object>({ cmd: 'check token'}, data).toPromise().catch((err) => err);
   }
 
   forgotPass(email) {
-    return this.authClient.send<object>({ cmd: 'forgot password' }, email);
+    return this.authClient.send<object>({ cmd: 'forgot password' }, email).catch((err) => err);
   }
 
   changePass(data: object) {
@@ -72,7 +74,7 @@ export class AppService {
     return this.userClient.send<string>({ cmd: 'deleteUser' }, id);
   }
 
-  deleteToken(id: string) {
-    return this.tokenService.deleteAll(id);
+  logout(data: object) {
+    return this.authClient.send<object>({ cmd: 'logout' }, data);
   }
 }

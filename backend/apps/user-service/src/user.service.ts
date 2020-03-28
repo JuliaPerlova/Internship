@@ -3,6 +3,7 @@ import { Model } from 'mongoose';
 
 import { IUser } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class UserService {
@@ -11,7 +12,6 @@ export class UserService {
     async createUser(createUserDto: CreateUserDto, role: string, status: string): Promise<IUser> {
         const createdUser = new this.userModel({ ...createUserDto, role, status });
         return await createdUser.save();
-
     }
 
     async getAllUsers(): Promise<IUser[]> {

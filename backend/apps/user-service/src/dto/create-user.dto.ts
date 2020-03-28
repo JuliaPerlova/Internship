@@ -7,7 +7,7 @@ export class CreateUserDto {
     readonly email: string;
 
     @Matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/gm, 
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/m, 
         { message: 'Weak password'},
     )
     readonly password: string;
@@ -16,17 +16,14 @@ export class CreateUserDto {
     @IsNotEmpty()
     readonly login: string;
 
-    @IsString()
+    readonly status: string;
     readonly gender: string;
     readonly avatar: string;
     readonly avatarId: string;
     readonly phone: string;
     readonly role: string;
-    readonly status: string;
-
-    @IsDate()
     readonly createdAt: Date;
-    
     readonly address: IAddress;
     readonly _id: string;
+
 }
