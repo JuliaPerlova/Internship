@@ -20,14 +20,11 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @MessagePattern({ cmd: 'login'})
-  @UseFilters(ExceptionFilter)
-  @UsePipes(ValidationPipe)
   async login({ email, password }: LoginDto): Promise<IUserToken> {
       return await this.authService.signIn({ email, password });
   }
 
   @MessagePattern({ cmd: 'sign up' })
-  @UseFilters(MongoExceptionFilter)
   @UsePipes(ValidationPipe)
   async signUp(createUserDto: CreateUserDto): Promise<boolean> {
       return await this.authService.signUp(createUserDto);

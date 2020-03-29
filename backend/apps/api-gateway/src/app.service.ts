@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ClientProxy, Transport, ClientProxyFactory } from '@nestjs/microservices';
 
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { response } from 'express';
 
 @Injectable()
 export class AppService {
@@ -31,19 +32,27 @@ export class AppService {
   }
 
   login(data: object) {
-    return this.authClient.send<object>({ cmd: 'login' }, data).toPromise().catch((err) => err);
+    return this.authClient.send<object>({ cmd: 'login' }, data)
+    .toPromise()
+    .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
   }
 
   signUp(data: object) {
-    return this.authClient.send<object>({ cmd: 'sign up' }, data).toPromise().catch((err) => err);
+    return this.authClient.send<any>({ cmd: 'sign up' }, data)
+    .toPromise()
+    .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
   }
 
   checkToken(data: object) {
-    return this.authClient.send<object>({ cmd: 'check token'}, data).toPromise().catch((err) => err);
+    return this.authClient.send<object>({ cmd: 'check token'}, data)
+    .toPromise()
+    .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
   }
 
   forgotPass(email) {
-    return this.authClient.send<object>({ cmd: 'forgot password' }, email).catch((err) => err);
+    return this.authClient.send<object>({ cmd: 'forgot password' }, email)
+    .toPromise()
+    .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
   }
 
   changePass(data: object) {

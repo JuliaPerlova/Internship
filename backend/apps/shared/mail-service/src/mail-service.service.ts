@@ -13,7 +13,7 @@ export class MailServiceService {
     })
 
     async confirmEmail(email: string, id: string, token: string) {
-        const link = `http://localhost:3000/auth/${id}/confirmation/token=${token}`;
+        const link = `http://localhost:4000/auth/${id}/confirmation/token=${token}`;
         return await MailServiceService.transporter.sendMail({
             from: process.env.EMAIL,
             to: email,
@@ -25,7 +25,7 @@ export class MailServiceService {
     }
 
     async changePass(email: string, id: string, token: string) {
-        const link = `http://localhost:3000/auth/${id}/forgot/token=${token}`;
+        const link = `http://localhost:4000/auth/${id}/forgot/token=${token}`;
         return await MailServiceService.transporter.sendMail({
             from: process.env.EMAIL,
             to: email,

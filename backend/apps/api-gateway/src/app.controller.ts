@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Req, UseFilters, } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, Req, UseFilters, Redirect, } from '@nestjs/common';
 import { Request } from 'express';
 
 import { AppService } from './app.service';
@@ -16,11 +16,13 @@ export class AppController {
   }
 
   @Post('/auth/login')
+  @UseFilters(HttpExceptionFilter)
   login(@Body() data: object) {
     return this.appService.login(data);
   }
 
   @Post('/auth/sign-up')
+  @UseFilters(HttpExceptionFilter)
   signUp(@Body() data: object) {
     return this.appService.signUp(data);
   }
@@ -31,18 +33,19 @@ export class AppController {
   }
 
   @Get('/auth/:id/forgot/token=:token')
+  @Redirect('http://localhost:3000/auth/:id/forgot/token=:token')
+  @UseFilters(HttpExceptionFilter)
   checkToken(@Req() req: Request) {
     return this.appService.checkToken({ ...req.params, ...req.query });
   }
 
-  @Post('/auth/:id/forgot/token=:token')
-  changePass(
-    @Req() req: Request, 
-    @Body() { password }) {
-    return this.appService.changePass({ ...req.params, ...req.query, password });
+  @Post('/auth/forgot/change')
+  changePass(@Body() { id, token, password }) {
+    return this.appService.changePass({ id, token, password });
   }
 
   @Get('/auth/:id/confirmation/token=:token')
+  @Redirect('http://localhost:3000/auth/login')
   confirmEmail(@Req() req: Request) {
     return this.appService.confirmEmail({ ...req.params, ...req.query });
   }

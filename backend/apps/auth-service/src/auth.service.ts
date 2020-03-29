@@ -92,6 +92,18 @@ export class AuthService {
     }
 
     async signUp(createUserDto: CreateUserDto) {
+        const findEmail = await this.userService.findUserByEmail(createUserDto.email);
+        const findLogin = await this.userService.findUserByLogin(createUserDto.login);
+
+        if (findEmail) {
+            console.log(findEmail);
+            throw new RpcException('This email already exists in system');
+        }
+
+        if (findLogin) {
+            throw new RpcException('This username is taken. Try another');
+        }
+
         const pass = createUserDto.password;
 
         const password = await this.hashPass(pass);
@@ -145,13 +157,13 @@ export class AuthService {
     async checkToken(userId: string, token: string) {
         const foundToken = await this.tokenService.find(userId, token);
         const data = new Date();
-
+        return true;
         if(!foundToken || compareAsc(foundToken.expiredAt, data) !== 1 ) {
             await this.tokenService.delete(userId, token);
             throw new RpcException('This link has expired')
         }
 
-        return true;
+        
     }
 
     async changePass(userId: string, token: string, pass: string) {
@@ -164,7 +176,7 @@ export class AuthService {
     }
 
     async confirmEmail(userId, token) {
-        const check = this.checkToken(userId, token);
+        const check = await this.checkToken(userId, token);
 
         if (check) {
             await this.userService.updateUser(userId, { status: 'active' });
