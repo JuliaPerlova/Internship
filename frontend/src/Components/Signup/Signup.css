@@ -1,0 +1,21 @@
+.center {
+    display: flex;
+    flex-direction: column;
+    margin: 10% 0;
+    align-items: center;
+}
+
+.container {
+    background: #edf2f8;
+    box-shadow: 1px 1px 7px 0px rgb(166, 191, 217, 0.6);
+    text-align: center;
+    width: 350px;
+}
+
+.signup-form {
+    max-width: 400px;
+}
+
+.signup-form-button {
+    width: 100%;
+}
