@@ -1,4 +1,4 @@
-import { Controller, UseFilters } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { UsePipes } from '@nestjs/common';
 
@@ -10,16 +10,13 @@ import { IUserToken } from '../../token-service/src/interfaces/user-token.interf
 import { ValidationPipe } from '../../shared/pipes/src/validation.pipe';
 
 import { LoginDto } from './dto/login.dto';
-import { MongoExceptionFilter } from '../../shared/filters/src/mongo-exception.filter';
-import { ExceptionFilter } from '../../shared/filters/src/rpc-exception.filter';
-
-
 
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @MessagePattern({ cmd: 'login'})
+  @UsePipes(ValidationPipe)
   async login({ email, password }: LoginDto): Promise<IUserToken> {
       return await this.authService.signIn({ email, password });
   }
@@ -28,12 +25,6 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   async signUp(createUserDto: CreateUserDto): Promise<boolean> {
       return await this.authService.signUp(createUserDto);
-  }
-
-  @MessagePattern({ cmd: 'check token'})
-  @UseFilters(ExceptionFilter)
-  async checkToken({ id, token}): Promise<boolean> {
-    return await this.authService.checkToken(id, token);
   }
 
   @MessagePattern({ cmd: 'forgot password' })

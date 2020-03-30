@@ -20,7 +20,7 @@ export class TokenService {
     }
 
     async find(uId: string, token: string): Promise<IUserToken> {
-        return await this.userTokenModel.findOne({ uId }, { token });
+        return await this.userTokenModel.findOne({ uId , token });
     }
 
     async delete(uId: string, token: string): Promise<{ ok?: number, n?: number }> {

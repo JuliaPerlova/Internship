@@ -1,7 +1,6 @@
 import { Catch, ArgumentsHost, Logger, ExceptionFilter } from '@nestjs/common';
 import { throwError } from 'rxjs';
 import { MongoError } from 'mongodb';
-import { response } from 'express';
 
 @Catch(MongoError)
 export class MongoExceptionFilter implements ExceptionFilter {
@@ -17,7 +16,7 @@ export class MongoExceptionFilter implements ExceptionFilter {
         };
 
         Logger.error(`${exception.message}`, 'ExceptionFilter');
-        return throwError(errorRes);
+        return throwError(errorRes)
 
     }
 }

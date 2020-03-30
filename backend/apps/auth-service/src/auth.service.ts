@@ -95,15 +95,13 @@ export class AuthService {
         const findEmail = await this.userService.findUserByEmail(createUserDto.email);
         const findLogin = await this.userService.findUserByLogin(createUserDto.login);
 
-        if (findEmail) {
-            console.log(findEmail);
-            throw new RpcException('This email already exists in system');
+        if(findEmail) {
+            throw new RpcException('This email is already registered in system');
         }
-
-        if (findLogin) {
+        if(findLogin) {
             throw new RpcException('This username is taken. Try another');
         }
-
+        
         const pass = createUserDto.password;
 
         const password = await this.hashPass(pass);
@@ -154,36 +152,19 @@ export class AuthService {
         return true;
     }
 
-    async checkToken(userId: string, token: string) {
-        const foundToken = await this.tokenService.find(userId, token);
-        const data = new Date();
-        return true;
-        if(!foundToken || compareAsc(foundToken.expiredAt, data) !== 1 ) {
-            await this.tokenService.delete(userId, token);
-            throw new RpcException('This link has expired')
-        }
-
-        
-    }
-
     async changePass(userId: string, token: string, pass: string) {
-        await this.tokenService.deleteAll(userId);
+            await this.tokenService.deleteAll(userId);
 
-        const password = await this.hashPass(pass); 
-        await this.userService.updateUser(userId, { password });
+            const password = await this.hashPass(pass); 
+            await this.userService.updateUser(userId, { password });
 
-        return true;
+            return true;
     }
 
     async confirmEmail(userId, token) {
-        const check = await this.checkToken(userId, token);
-
-        if (check) {
             await this.userService.updateUser(userId, { status: 'active' });
             await this.tokenService.delete(userId, token);
             return true;
-        }
-
     }
 
     async logout(userId, token) {

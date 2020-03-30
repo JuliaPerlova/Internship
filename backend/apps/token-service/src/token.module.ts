@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 
 import { DatabaseModule } from '../../shared/database/src/database.module';
 
 import { TokenService } from './token.service';
 import { tokensProviders } from './token.providers';
 
+@Global()
 @Module({
     imports: [DatabaseModule],
     controllers: [],
