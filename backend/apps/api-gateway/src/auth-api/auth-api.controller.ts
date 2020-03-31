@@ -1,10 +1,9 @@
-import { Controller, Get, Post, Body, Req, UseFilters, Redirect, UseGuards, } from '@nestjs/common';
-import { Request } from 'express';
+import { Controller, Get, Post, Body, UseFilters, Redirect, Param } from '@nestjs/common';
+import 'dotenv/config';
 
 import { AuthApiService } from './auth-api.service';
 
 import { HttpExceptionFilter } from '../../../shared/filters/src/http-exception.filter';
-import { TokenGuard } from '../../../shared/guards/token.guard';
 
 @Controller()
 export class AuthApiController {
@@ -27,30 +26,28 @@ export class AuthApiController {
         return this.appService.forgotPass(email);
     }
 
-    @Get('/auth/:id/change/token=:token')
+    @Get('/auth/change/token=:token')
     @UseFilters(HttpExceptionFilter)
-    @UseGuards(TokenGuard)
-    checkToken() {
-        return false;
+    checkToken(@Param('token') token: string) {
+        return this.appService.checkToken(token);
     }
 
-    @Post('/auth/:id/change/token=:token')
+    @Post('/auth/change/token=:token')
     @UseFilters(HttpExceptionFilter)
-    @UseGuards(TokenGuard)
     changePass(
-        @Req() req: Request, 
+        @Param('token') token: string, 
         @Body() { password }) {
-        return this.appService.changePass({ ...req.params, ...req.query, password });
+        return this.appService.changePass({ token, password });
     }
 
-    @Get('/auth/:id/confirmation/token=:token')
-    @Redirect('http://localhost:3000/auth/login')
-    confirmEmail(@Req() req: Request) {
-        return this.appService.confirmEmail({ ...req.params, ...req.query });
+    @Get('/auth/confirmation/token=:token')
+    @Redirect(`${process.env.FRONT_URL}/auth/login`)
+    confirmEmail(@Param('token') token: string) {
+        return this.appService.confirmEmail(token);
     }
 
-    @Get(':id/token=:token/logout')
-    logout(@Req() req: Request) {
-        return this.appService.logout({ ...req.params, ...req.query });
+    @Get('/token=:token/logout')
+    logout(@Param('token') token: string) {
+        return this.appService.logout(token);
     }
 }

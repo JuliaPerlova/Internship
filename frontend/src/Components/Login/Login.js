@@ -42,7 +42,7 @@ export default class Login extends React.Component {
 
     render() {
         return (
-            this.state.token ? <Redirect to={`/main/${this.state.uId}/token=${this.state.token}`} /> :
+            this.state.token ? <Redirect to={`/main/token=${this.state.token}`} /> :
             <div className="center">
                 <h1>Welcome back!</h1>
                 <p>Please log in to your account</p>

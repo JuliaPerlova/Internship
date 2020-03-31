@@ -33,7 +33,7 @@ export default class NewPassword extends React.Component {
             password: this.state.password,
         }
 
-        return axios.post(`http://localhost:4000${this.state.id}`, data)
+        return axios.post(`http://localhost:4000${this.pathname()}`, data)
         .then((response) => {
             console.log(response);
             this.setState({ isSent: true })

@@ -27,8 +27,8 @@ export class AuthApiService {
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }
 
-    checkToken(data: object) {
-        return this.authClient.send<object>({ cmd: 'check token'}, data)
+    checkToken(token: string) {
+        return this.authClient.send<object>({ cmd: 'check token'}, token)
         .toPromise()
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }
@@ -39,17 +39,17 @@ export class AuthApiService {
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }
 
-    changePass(data: object) {
+    changePass(data) {
         return this.authClient.send<object>({ cmd: 'change password' }, data)
         .toPromise()
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }
 
-    confirmEmail(data: object) {
-        return this.authClient.send<object>({ cmd: 'confirmation'}, data);
+    confirmEmail(token: string) {
+        return this.authClient.send<object>({ cmd: 'confirmation'}, token);
     }
     
-    logout(data: object) {
-        return this.authClient.send<object>({ cmd: 'logout'}, data);
+    logout(token: string) {
+        return this.authClient.send<object>({ cmd: 'logout'}, token);
     }
 }

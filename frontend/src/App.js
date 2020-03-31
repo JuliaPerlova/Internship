@@ -14,8 +14,8 @@ function App() {
       <Route path="/auth/sign-up" component={Signup} />
       <Route path="/auth/login" component={Login} />
       <Route path="/auth/forgot" component={Forgot} />
-      <Route path="/auth/:uId/change/token=:token" component={NewPassword} />
-      <Route path="/main/:uId/token=:token" component={Main} />
+      <Route path="/auth/change/token=:token" component={NewPassword} />
+      <Route path="/main/token=:token" component={Main} />
       
     </div>
   );

@@ -27,19 +27,13 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) {}
     
-    private async mailSend(email: string, message: string, token: string, id: string) {
-        const user = this.userService.findUserByEmail(email);
-
-        if(!user) {
-            throw new UnauthorizedException();
-        }
-
+    private async mailSend(email: string, message: string, token: string) {
         switch(message) {
             case 'New User': 
-                await this.mailService.confirmEmail(email, id, token,);
+                await this.mailService.confirmEmail(email, token,);
                 break;
             case 'Forgot Password':
-                await this.mailService.changePass(email, id, token);
+                await this.mailService.changePass(email, token);
                 break;
         }
     }
@@ -116,7 +110,7 @@ export class AuthService {
 
         const token = this.accessToken(user, { expiresIn });
 
-        await this.mailSend(user.email, 'New User', token, user._id);
+        await this.mailSend(user.email, 'New User', token);
 
         const expiredAt = addDays(Date.now(), 1);
 
@@ -142,7 +136,7 @@ export class AuthService {
 
         const expiredAt = addDays(Date.now(), 1);
 
-        await this.mailSend(email, 'Forgot Password', token, user._id);
+        await this.mailSend(email, 'Forgot Password', token);
         await this.createToken({
             token,
             uId: user._id,
@@ -152,23 +146,25 @@ export class AuthService {
         return true;
     }
 
-    async changePass(userId: string, token: string, pass: string) {
-            await this.tokenService.deleteAll(userId);
+    async changePass(token: string, pass: string) {
+        const userId = (await this.tokenService.find(token)).uId;
+        await this.tokenService.deleteAll(userId);
 
-            const password = await this.hashPass(pass); 
-            await this.userService.updateUser(userId, { password });
+        const password = await this.hashPass(pass); 
+        await this.userService.updateUser(userId, { password });
 
-            return true;
+        return true;
     }
 
-    async confirmEmail(userId, token) {
-            await this.userService.updateUser(userId, { status: 'active' });
-            await this.tokenService.delete(userId, token);
-            return true;
+    async confirmEmail(token) {
+        const userId = (await this.tokenService.find(token)).uId;
+        await this.userService.updateUser(userId, { status: 'active' });
+        await this.tokenService.delete(token);
+        return true;
     }
 
-    async logout(userId, token) {
-        await this.tokenService.delete(userId, token);
+    async logout(token) {
+        await this.tokenService.delete(token);
         return true;
     }
 

@@ -15,16 +15,16 @@ export class TokenService {
         return await userToken.save();
     }
 
-    async exists(uId: string, token: string): Promise<boolean> {
-        return await this.userTokenModel.exists({ uId, token });
+    async exists(token: string): Promise<boolean> {
+        return await this.userTokenModel.exists({ token });
     }
 
-    async find(uId: string, token: string): Promise<IUserToken> {
-        return await this.userTokenModel.findOne({ uId , token });
+    async find(token: string): Promise<IUserToken> {
+        return await this.userTokenModel.findOne({ token });
     }
 
-    async delete(uId: string, token: string): Promise<{ ok?: number, n?: number }> {
-        return await this.userTokenModel.deleteOne({ uId, token });
+    async delete(token: string): Promise<{ ok?: number, n?: number }> {
+        return await this.userTokenModel.deleteOne({ token });
     }
 
     async deleteAll(uId: string): Promise<{ ok?: number, n?: number }> {

@@ -12,8 +12,8 @@ export class MailServiceService {
         }
     })
 
-    async confirmEmail(email: string, id: string, token: string) {
-        const link = `${process.env.BACK_URL}/auth/${id}/confirmation/token=${token}`;
+    async confirmEmail(email: string, token: string) {
+        const link = `${process.env.BACK_URL}/auth/confirmation/token=${token}`;
         return await MailServiceService.transporter.sendMail({
             from: process.env.EMAIL,
             to: email,
@@ -24,8 +24,8 @@ export class MailServiceService {
         }).then(() => console.log('success')).catch((err) => console.log(err));
     }
 
-    async changePass(email: string, id: string, token: string) {
-        const link = `${process.env.FRONT_URL}/auth/${id}/change/token=${token}`;
+    async changePass(email: string, token: string) {
+        const link = `${process.env.FRONT_URL}/auth/change/token=${token}`;
         return await MailServiceService.transporter.sendMail({
             from: process.env.EMAIL,
             to: email,

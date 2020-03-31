@@ -1,15 +1,15 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { UsePipes } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '../../user-service/src/dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
 
+import { CreateUserDto } from '../../user-service/src/dto/create-user.dto';
 import { IUserToken } from '../../token-service/src/interfaces/user-token.interface';
 
 import { ValidationPipe } from '../../shared/pipes/src/validation.pipe';
-
-import { LoginDto } from './dto/login.dto';
+import { TokenGuard } from '../../shared/guards/token.guard';
 
 @Controller()
 export class AuthController {
@@ -32,18 +32,24 @@ export class AuthController {
       return await this.authService.forgotPass(email);
   }
 
+  @UseGuards(TokenGuard)
+  @MessagePattern({ cmd: 'check token' })
+  checkToken(): boolean {
+    return false;
+  }
+
   @MessagePattern({ cmd: 'change password' })
-  async changePass({ id, token, password }): Promise<boolean> {
-    return await this.authService.changePass(id, token, password);
+  async changePass({ token, password }): Promise<boolean> {
+    return await this.authService.changePass(token, password);
   }
 
   @MessagePattern({cmd: 'confirmation'})
-  async confirmEmail({ id, token }): Promise<boolean> {
-    return await this.authService.confirmEmail(id, token);
+  async confirmEmail(token: string): Promise<boolean> {
+    return await this.authService.confirmEmail(token);
   }
 
   @MessagePattern({ cmd: 'logout' })
-  async logout({ id, token }): Promise<boolean> {
-    return await this.authService.logout(id, token);
+  async logout(token: string): Promise<boolean> {
+    return await this.authService.logout(token);
   }
 }
