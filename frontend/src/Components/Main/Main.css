@@ -1,0 +1,13 @@
+.ant-layout {
+    border: 1px solid black;
+  }
+
+.ant-layout-sider {
+    background: #f0f2f5;
+    border: 1px solid black;
+}
+  
+.ant-layout-header {
+    background: #f0f2f5;
+  }
+  
