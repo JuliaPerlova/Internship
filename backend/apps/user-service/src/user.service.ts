@@ -3,7 +3,6 @@ import { Model } from 'mongoose';
 
 import { IUser } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
-import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class UserService {
