@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Model } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 
 import { IUser } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -8,8 +9,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UserService {
     constructor(@Inject('USER_MODEL') private userModel: Model<IUser>) {}
 
+    private async hashPass(password: string) {
+        const salt = await bcrypt.genSalt(10);
+        return await bcrypt.hash(password, salt);
+    }
+
     async createUser(createUserDto: CreateUserDto, role: string, status: string): Promise<IUser> {
-        const createdUser = new this.userModel({ ...createUserDto, role, status });
+        const password = await this.hashPass(createUserDto.password);
+        const createdUser = new this.userModel({ ...createUserDto, password, role, status });
         return await createdUser.save();
     }
 
@@ -30,6 +37,9 @@ export class UserService {
     }
 
     async updateUser(userId: string, newData: any): Promise<IUser> {
+        if (newData.password) {
+            newData.password = await this.hashPass(newData.password);
+        }
         return await this.userModel.findByIdAndUpdate(userId, newData, { new: true }).exec();
     }
 

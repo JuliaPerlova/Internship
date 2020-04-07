@@ -39,7 +39,6 @@ export default class Signup extends React.Component {
     };
 
     render() {
-        console.log(this.state);
         return (
             this.state.userIsCreated ? <Redirect to="/auth/login" /> :
             <div className="center">

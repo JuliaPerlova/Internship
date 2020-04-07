@@ -7,12 +7,12 @@ import { UserApiService } from './user-api.service';
 export class UserApiController {
     constructor(private readonly appService: UserApiService) {}
 
-    @Get('/main/settings')
+    @Post('/main/settings')
     getUser(@Body() { token, uId }) {
         return this.appService.getUser(token, uId);
     }
 
-    @Patch('/main/setings')
+    @Patch('/main/settings')
     updateUser(@Body() { token, uId, data }) {
         return this.appService.updateUser(token, uId, data);
     }
@@ -21,5 +21,4 @@ export class UserApiController {
     deleteUser(@Body() { token, uId }) {
         return this.appService.deleteUser(token, uId);
     }
-}
 }
