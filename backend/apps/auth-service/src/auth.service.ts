@@ -30,7 +30,7 @@ export class AuthService {
     private async mailSend(email: string, message: string, token: string) {
         switch(message) {
             case 'New User': 
-                await this.mailService.confirmEmail(email, token,);
+                await this.mailService.confirmEmail(email, token);
                 break;
             case 'Forgot Password':
                 await this.mailService.changePass(email, token);

@@ -13,6 +13,10 @@ export default class Main extends React.Component {
         imgSrc: null,
     }
 
+    updateData = (value) => {
+        this.setState({ imgSrc: value })
+     }
+
     componentDidMount() {
         return axios.post('http://localhost:4000/main/settings', { 
             token: localStorage.getItem('token'),

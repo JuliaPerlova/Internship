@@ -46,6 +46,7 @@ export default class Signup extends React.Component {
                 <p>Please fill in the form fields</p>
                 <div className="container">
                     <Form style={{margin: "20px"}}
+                    onFinish={this.responseHandler}
                     name="signup"
                     className="signup-form"
                     size="large"
@@ -131,7 +132,7 @@ export default class Signup extends React.Component {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" className="signup-form-button" onClick={this.responseHandler}>
+                            <Button type="primary" htmlType="submit" className="signup-form-button">
                             Sign up
                             </Button>
                             

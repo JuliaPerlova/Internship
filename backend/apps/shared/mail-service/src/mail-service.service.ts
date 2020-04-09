@@ -19,7 +19,7 @@ export class MailServiceService {
             to: email,
             subject: 'Verificate your email',
             html: `<h3>We are glad to see you in our community!</h3> 
-                   <p>Please click on this link ${link} to confirm your email. Hurry up! This link will be available for one day. </p><br>
+                   <p>Please click on this <a href=${link}>link</a> to confirm your email. Hurry up! This link will be available for one day. </p><br>
                    <p>If you didnt sign up, then please ignore this message.</p>`
         }).then(() => console.log('success')).catch((err) => console.log(err));
     }
@@ -31,7 +31,7 @@ export class MailServiceService {
             to: email,
             subject: 'Change password request',
             html: `<h3>Forgot your password? It's not a problem for sure!</h3> 
-                   <p>Please click on this link ${link} to change your password. Hurry up! This link will be available for one day. </p><br>
+                   <p>Please click on this <a href=${link}>link</a> to change your password. Hurry up! This link will be available for one day. </p><br>
                    <p>If you didnt send this requst, we recommend that you contact our support</p>`
         }).then(() => console.log('success!')).catch((err) => console.log(err));
     }

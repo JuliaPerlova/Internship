@@ -3,14 +3,28 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Model } from 'mongoose';
 
 import { IPost } from './interfaces/post.interface';
+import { ITemplate } from './interfaces/template.interface';
 import { CreatePostDto } from './dto/post.dto';
+import { CreateTemplateDto } from './dto/template.dto';
+import facebookPostTemplate from './templates/facebook.template';
 
 @Injectable()
 export class PostService {
-  constructor(@Inject('POST_MODEL') private readonly postModel: Model<IPost>) {}
+  static templates = [facebookPostTemplate];
+  constructor(
+    @Inject('POST_MODEL') private readonly postModel: Model<IPost>,
+    @Inject('TEMPLATE_MODEL') private readonly templateModel: Model<ITemplate>,
+  ) {}
 
-  async createPost(createPostDto: CreatePostDto): Promise<IPost> {
-    const post = new this.postModel(createPostDto);
+  getTemplate(provider: string) {
+    const template = PostService.templates.filter((t) => t.provider === provider);
+    return template;
+  }
+
+  async createPost(createPostDto: CreatePostDto, template: CreateTemplateDto): Promise<IPost> {
+    const postTemplate = await new this.templateModel(template).save();
+    const templateId = postTemplate._id;
+    const post = new this.postModel({ ...createPostDto, templateId });
     return await post.save();
   }
 
@@ -18,20 +32,26 @@ export class PostService {
     return await this.postModel.findByIdAndUpdate(postId, newData, { new: true }).exec();
   }
 
-  async findOne(postId): Promise<IPost> {
-    return await this.postModel.findById(postId).exec();
+  async findOne(postId): Promise<[IPost, ITemplate]> {
+    const post = await this.postModel.findById(postId).exec();
+    const template = await this.templateModel.findById(post.templateId).exec();
+    return [post, template];
   }
 
   async findAll(uId: string): Promise<IPost[]> {
-    return await this.postModel.find({ uId }).exec();
+    const posts = await this.postModel.find({ uId }).exec();
+    return posts.map((p) => [p, this.templateModel.findById(p.templateId)]);
   }
 
-  async deletePost(postId: string): Promise<IPost> {
-    return await this.postModel.findByIdAndDelete(postId).exec();
+  async deletePost(postId: string): Promise<Boolean> {
+    const post = await this.postModel.findByIdAndDelete(postId).exec();
+    await this.templateModel.findByIdAndDelete(post.templateId).exec();
+    return true;
   }
 
-  async deleteAll(uId: string): Promise<IPost[]> {
-    return await this.postModel.deleteMany({ uId }).exec();
+  async deleteAll(uId: string): Promise<Boolean> {
+    await this.postModel.deleteMany({ uId }).exec();
+    return true;
   }
   
 }

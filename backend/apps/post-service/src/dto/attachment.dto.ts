@@ -6,7 +6,4 @@ export class CreateAttachDto {
     readonly link: string;
     readonly fileId: string;
     readonly contentType: string;
-
-    readonly postId: string;
-    readonly createdAt: Date;
 }

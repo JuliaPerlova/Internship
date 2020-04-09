@@ -48,6 +48,7 @@ export default class Login extends React.Component {
                 <p>Please log in to your account</p>
                 <div className="container">
                     <Form style={{margin: "20px"}}
+                    onFinish={this.responseHandler}
                     name="login"
                     className="login-form"
                     size="large"
@@ -88,7 +89,7 @@ export default class Login extends React.Component {
                                 />
                         </Form.Item>
                         <Form.Item>
-                                <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.responseHandler}>
+                                <Button type="primary" className="login-form-button" htmlType="submit">
                                 Log in
                                 </Button>
                         </Form.Item>

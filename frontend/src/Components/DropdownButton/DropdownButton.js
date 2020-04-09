@@ -24,21 +24,6 @@ export default class DropdownButton extends React.Component {
     this.setState({
       modalVisible: false,
     });
-    const data = {
-      firstName: this.state.firstname,
-      lastName: this.state.lastname,
-      password: this.state.changepass,
-      timeZone: this.state.timezone,
-      avatar: this.state.avatar,
-      avatarId: this.state.avatarId,
-    }
-    return axios.patch('http://localhost:4000/main/settings', { 
-      token: localStorage.getItem('token'),
-      uId: localStorage.getItem('uId'),
-      data,
-    }).then((res) => {
-      console.log(res)
-    }).catch((err) => console.error(err))
   };
 
   handleCancel = () => {
@@ -125,11 +110,23 @@ handleInputTime = (value) => {
   })
 }
 
-passIsValid = (event) => {
-  const regExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,20}$/m;
-  const pass = event.target.value;
-  console.log(!regExp.test(pass))
-  return !regExp.test(pass);
+onFinish = () => {
+  const data = {
+    firstName: this.state.firstname,
+    lastName: this.state.lastname,
+    password: this.state.changepass,
+    timeZone: this.state.timezone,
+    avatar: this.state.avatar,
+    avatarId: this.state.avatarId,
+  }
+  return axios.patch('http://localhost:4000/main/settings', { 
+    token: localStorage.getItem('token'),
+    uId: localStorage.getItem('uId'),
+    data,
+  }).then((res) => {
+    this.props.updateData(this.state.avatar)
+    console.log(res)
+  }).catch((err) => console.error(err))
 }
 
   menu = (
@@ -163,9 +160,10 @@ passIsValid = (event) => {
           visible={this.state.modalVisible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
-          okButtonProps={{disabled: this.passIsValid}} //////////////////////////////////////////////////////////
+          footer={null}
         >
           <Form
+          onFinish={this.onFinish}
           name="form"
           >
             <Form.Item>
@@ -178,23 +176,18 @@ passIsValid = (event) => {
             <Form.Item
             name="changepass"
             hasFeedback
-            validateStatus
             rules={[
                 {
                     pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,20}$/m,
                     message: 'Password must contain capital, lowercase letters and numbers and also have length of 8 to 20 characters',
-                },
-                {
-                  required: true,
-                  message: 'Please input your Password!',
-              }
+                }
             ]}
             >
                 <Input.Password prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 placeholder="Change password"
                 name="changepass" 
-                onChange={this.handleInputChange, this.passIsValid}
+                onChange={this.handleInputChange}
                 />
             </Form.Item>
 
@@ -212,7 +205,12 @@ passIsValid = (event) => {
                   <UploadOutlined /> Upload avatar
                 </Button>
               </Upload>
-              <img style={{width: "80px", height: "80px"}} src={this.state.avatar}/>
+              <img style={{width: "80px", height: "80px"}} src={this.state.avatar} alt="userAvatar"/>
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" >
+                Save
+              </Button>
             </Form.Item>
           </Form>
       </Modal>

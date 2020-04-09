@@ -1,4 +1,4 @@
 export enum contentEnum {
-    image = "image",
-    video = "video",
+    image = 'image',
+    video = 'video',
 }

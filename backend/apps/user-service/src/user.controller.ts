@@ -1,10 +1,11 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
 import { AuthGuard } from '../../shared/guards/auth.guard';
 
 import { UserService } from './user.service';
 import { IUser } from './interfaces/user.interface';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('user')
 @UseGuards(AuthGuard)
@@ -22,7 +23,8 @@ export class UserController {
     }
 
     @MessagePattern({ cmd: 'update user' })
-    updateUser({ uId, data }): Promise<IUser> {
+    @UsePipes(ValidationPipe)
+    updateUser({ uId, data }: { uId: string, data: CreateUserDto }): Promise<IUser> {
         return this.userService.updateUser(uId, data);
     }
 

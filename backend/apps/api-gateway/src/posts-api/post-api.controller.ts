@@ -9,23 +9,28 @@ import { PostApiService } from './post-api.service';
 export class PostApiController {
     constructor(private readonly appService: PostApiService) {}
 
-    @Get('/main/posts')
+    @Post('/template') 
+    getTemplate(@Body() provider: string) {
+        return this.appService.getTemplate(provider);
+    }
+
+    @Post('/main/posts')
     getPosts(@Body() { token, uId }) {
         return this.appService.getPosts(token, uId);
     }
 
     @Post('/main/posts/new')
-    createPost(@Body() token: string, data: object) {
-        return this.appService.createPost(token, data);
+    createPost(@Body() { token, data, template }) {
+        return this.appService.createPost(token, data, template);
     }
     
-    @Get('/main/posts/:postId')
+    @Post('/main/posts/:postId')
     getPost(@Param() postId: string, @Body() token: string) {
         return this.appService.findPost(token, postId);
     }
 
     @Patch('/main/posts/:postId')
-    updatePost(@Param() postId: string, @Body() token: string, data: object) {
+    updatePost(@Param() postId: string, @Body() { token, data }) {
         return this.appService.updatePost(postId, token, data);
     }
 

@@ -4,26 +4,31 @@ import { MessagePattern } from '@nestjs/microservices';
 import { AuthGuard } from '../../shared/guards/auth.guard';
 
 import { PostService } from './post.service';
-import { CreatePostDto } from './dto/post.dto';
 import { IPost } from './interfaces/post.interface';
+import { ITemplate } from './interfaces/template.interface';
 
 @Controller()
 @UseGuards(AuthGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @MessagePattern({ cmd: 'get template'})
+  getTemplate(provider: string) {
+    return this.postService.getTemplate(provider);
+  }
+
   @MessagePattern({ cmd: 'create post' })
-  async newPost({ createPostDto }): Promise<IPost> {
-    return this.postService.createPost(createPostDto);
+  async newPost({ createPostDto, template }): Promise<IPost> {
+    return this.postService.createPost(createPostDto, template);
   }
 
   @MessagePattern({ cmd: 'update post' })
-  updatePost(postId: string, newData: CreatePostDto): Promise<IPost> {
+  updatePost({ postId, newData }): Promise<IPost> {
     return this.postService.updatePost(postId, newData);
   }
 
   @MessagePattern({ cmd: 'find post' })
-  findOne(postId: string): Promise<IPost> {
+  findOne({ postId }): Promise<[IPost, ITemplate]> {
     return this.postService.findOne(postId);
   }
 
@@ -33,12 +38,12 @@ export class PostController {
   }
 
   @MessagePattern({ cmd: 'delete post' })
-  async deletePost(postId): Promise<IPost> {
+  async deletePost({ postId }): Promise<Boolean> {
     return this.postService.deletePost(postId);
   }
 
   @MessagePattern({ cmd: 'delete all' })
-  deleteAll(userId): Promise<IPost[]> {
+  deleteAll({ userId }): Promise<Boolean> {
     return this.postService.deleteAll(userId);
   }
 

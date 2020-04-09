@@ -15,14 +15,20 @@ export class PostApiService {
         });
     }
 
+    getTemplate(provider: string) {
+        return this.appClient.send<string>({ cmd: 'get template' }, provider)
+        .toPromise()
+        .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN )});
+    } 
+
     getPosts(token: string, uId: string) {
         return this.appClient.send<object>({ cmd: 'get posts' }, { token, uId })
         .toPromise()
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }
 
-    createPost(token, data: object) {
-        return this.appClient.send<object>({ cmd: 'create post' }, { token, data })
+    createPost(token: string, data: object, template: object) {
+        return this.appClient.send<object>({ cmd: 'create post' }, { token, data, template })
         .toPromise()
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }

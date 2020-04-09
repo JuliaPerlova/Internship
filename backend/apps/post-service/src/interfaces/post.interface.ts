@@ -8,5 +8,6 @@ export interface IPost extends Document {
     readonly body: IPostBody,
     readonly createdAt: Date,
     readonly updatedAt: Date,
+    readonly templateId: string,
     readonly _id: string,
 }

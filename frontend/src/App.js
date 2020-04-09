@@ -7,7 +7,6 @@ import Signup from './Components/Signup/Signup';
 import Login from './Components/Login/Login';
 import Forgot from './Components/Forgot/Forgot';
 import NewPassword from './Components/NewPassword/NewPassword';
-import { Editor } from 'react-draft-wysiwyg';
 import '../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 function App() {
