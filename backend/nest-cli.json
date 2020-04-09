@@ -70,6 +70,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/post-service/tsconfig.app.json"
       }
+    },
+    "social-service": {
+      "type": "application",
+      "root": "apps/social-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/social-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/social-service/tsconfig.app.json"
+      }
     }
   }
 }
