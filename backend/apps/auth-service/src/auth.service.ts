@@ -144,14 +144,14 @@ export class AuthService {
         return true;
     }
 
-    async confirmEmail(token) {
+    async confirmEmail(token: string) {
         const userId = (await this.tokenService.find(token)).uId;
         await this.userService.updateUser(userId, { status: 'active' });
         await this.tokenService.delete(token);
         return true;
     }
 
-    async logout(token) {
+    async logout(token: string) {
         await this.tokenService.delete(token);
         return true;
     }
