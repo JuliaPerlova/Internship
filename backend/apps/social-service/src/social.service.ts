@@ -4,13 +4,23 @@ import { Model } from 'mongoose';
 
 import { ISocial } from './interfaces/social.interface';
 import { CreateSocialDto } from './dto/social.dto';
+import { UserService } from '../../user-service/src/user.service';
 
 @Injectable()
 export class SocialService {
-  constructor(@Inject('SOCIAL_MODEL') private readonly socialModel: Model<ISocial>) {}
+  constructor(
+    @Inject('SOCIAL_MODEL') private readonly socialModel: Model<ISocial>,
+    private readonly userService: UserService,
+    ) {}
 
   async createConnection(createSocialDto: CreateSocialDto): Promise<ISocial> {
-    return await new this.socialModel(createSocialDto);
+    const user = await this.userService.findUserByEmail(createSocialDto.email);
+    
+    if (user) {
+      createSocialDto.userId = user._id;
+    }
+    
+    return await new this.socialModel(createSocialDto).save();
   }
 
   async getProfile(userId: string, provider: string): Promise<ISocial> {
@@ -25,8 +35,8 @@ export class SocialService {
     return await this.socialModel.findOneAndUpdate({ provider, providerId}, data).exec();
   }
   
-  async getAll(uId: string): Promise<ISocial[]> {
-    return await this.socialModel.find({ uId }).exec();
+  async getAll(userId: string): Promise<ISocial[]> {
+    return await this.socialModel.find({ userId }).exec();
   }
 
   async deleteProfile(provider: string, providerId: string): Promise<ISocial> {

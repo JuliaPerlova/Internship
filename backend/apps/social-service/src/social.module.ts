@@ -3,9 +3,10 @@ import { SocialController } from './social.controller';
 import { SocialService } from './social.service';
 import { DatabaseModule } from '../../shared/database/src/database.module';
 import { socialProviders } from './social.providers';
+import { UserModule } from '../../user-service/src/user.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, UserModule],
   controllers: [SocialController],
   providers: [
     SocialService, 

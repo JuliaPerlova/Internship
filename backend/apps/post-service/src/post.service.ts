@@ -7,21 +7,23 @@ import { ITemplate } from './interfaces/template.interface';
 import { CreatePostDto } from './dto/post.dto';
 import { CreateTemplateDto } from './dto/template.dto';
 import facebookPostTemplate from './templates/facebook.template';
+import linkedinPostTemplate from './templates/linkedin.template';
 
 @Injectable()
 export class PostService {
-  static templates = [facebookPostTemplate];
+  static templates = [facebookPostTemplate, linkedinPostTemplate];
   constructor(
     @Inject('POST_MODEL') private readonly postModel: Model<IPost>,
     @Inject('TEMPLATE_MODEL') private readonly templateModel: Model<ITemplate>,
   ) {}
 
-  getTemplate(provider: string) {
-    const template = PostService.templates.filter((t) => t.provider === provider);
-    return template;
+  getTemplates(providers: string[]) {
+    return providers.map((provider) => {
+      return PostService.templates.filter((t) => t.provider === provider)[0];
+    });
   }
 
-  async createPost(createPostDto: CreatePostDto, template: CreateTemplateDto): Promise<IPost> {
+  async createPost(createPostDto: CreatePostDto, template: CreateTemplateDto[]): Promise<IPost> {
     const postTemplate = await new this.templateModel(template).save();
     const templateId = postTemplate._id;
     const post = new this.postModel({ ...createPostDto, templateId });

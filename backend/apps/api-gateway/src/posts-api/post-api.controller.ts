@@ -10,8 +10,8 @@ export class PostApiController {
     constructor(private readonly appService: PostApiService) {}
 
     @Post('/template') 
-    getTemplate(@Body() provider: string) {
-        return this.appService.getTemplate(provider);
+    getTemplate(@Body() providers: string[]) {
+        return this.appService.getTemplate(providers);
     }
 
     @Post('/main/posts')

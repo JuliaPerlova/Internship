@@ -13,8 +13,8 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @MessagePattern({ cmd: 'get template'})
-  getTemplate(provider: string) {
-    return this.postService.getTemplate(provider);
+  getTemplate(providers: string[]) {
+    return this.postService.getTemplates(providers);
   }
 
   @MessagePattern({ cmd: 'create post' })

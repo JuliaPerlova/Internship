@@ -14,10 +14,10 @@ export default class NewPassword extends React.Component {
         isSent: false,
     }
 
-    async guard() {
-        return await axios.get(`http://localhost:4000${this.pathname()}`)
+    componentDidMount() {
+        return axios.get(`http://localhost:4000${this.pathname()}`)
         .then(() => this.setState({ isSent: false }))
-        .catch(() => this.setState({isSent: true}));
+        .catch(() => this.setState({ isSent: true}));
     }
 
 
@@ -44,7 +44,6 @@ export default class NewPassword extends React.Component {
         });
     };
     render() {
-        this.guard();
         return (
             (this.state.isSent) ? <Redirect to="/auth/login" /> : 
             <div className="center">

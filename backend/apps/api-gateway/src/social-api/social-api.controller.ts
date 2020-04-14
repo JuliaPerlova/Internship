@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseFilters, Param, Delete, Patch, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseFilters, Param, Delete, Patch, UseGuards, Req, Redirect } from '@nestjs/common';
 
 import { HttpExceptionFilter } from '../../../shared/filters/src/http-exception.filter';
 
@@ -16,12 +16,20 @@ export class SocialApiController {
         return;
     }
 
+    @Get('/linkedin')
+    @UseGuards(AuthGuard('linkedin'))
+    async linkedinAuth(@Req() req) {
+        return;
+    }
+
     @Get('/auth/facebook/callback')
     @UseGuards(AuthGuard('facebook'))
-    async getConnection(@Req() req) {
+    @Redirect('http://localhost:3000/main')
+    async getFB(@Req() req) {
         const findUser = await this.appService.findProfileByPId(req.user.provider, req.user.providerId);
 
         if (findUser) {
+            console.log(findUser);
             return this.appService.updateProfile(req.user.provider, req.user.providerId, { 
                 accessToken: req.user.accessToken, 
                 expiredAt: req.user.expiredAt 
@@ -31,6 +39,28 @@ export class SocialApiController {
         return this.appService.createConnection(req.user);
     }
 
+    @Get('/auth/linkedin/callback')
+    @UseGuards(AuthGuard('linkedin'))
+    @Redirect('http://localhost:3000/main')
+    async getLinkedin(@Req() req) {
+        const findUser = await this.appService.findProfileByPId(req.user.provider, req.user.providerId);
+
+        if (findUser) {
+            console.log(findUser);
+            return this.appService.updateProfile(req.user.provider, req.user.providerId, { 
+                accessToken: req.user.accessToken, 
+                expiredAt: req.user.expiredAt 
+            });
+        }
+
+        return this.appService.createConnection(req.user);
+    }
+
+    @Post('/social/profiles')
+    getAll(@Body() { uId }) {
+        return this.appService.getAll(uId);
+    }
+    
     @Get('/social/:provider/profile')
     getProfile(@Param() provider: string, @Body() uId: string) {
         return this.appService.getProfile(provider, uId);

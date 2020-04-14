@@ -5,7 +5,6 @@ export interface ISocial extends Document {
     readonly providerId: string,
     readonly userId: string,
     readonly email: string,
-    readonly userName: string,
     readonly firstName: string,
     readonly lastName: string,
     readonly avatar: string,

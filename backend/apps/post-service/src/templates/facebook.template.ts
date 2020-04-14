@@ -4,7 +4,7 @@ const facebookPostTemplate = {
     attachments: {
         image: true,
         video: true,
-        maxAttachLength: 10,
+        maxAttachLength: 80,
     },
     html: false,
     text: true,

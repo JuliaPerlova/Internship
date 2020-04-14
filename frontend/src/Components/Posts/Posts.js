@@ -1,13 +1,11 @@
 import React from 'react';
 import './Posts.css';
-import { Form, Input, Button, message, Upload, Select } from 'antd';
+import { Form, Input, Button, message, Upload } from 'antd';
 import { UploadOutlined } from "@ant-design/icons";
 import { Editor } from 'react-draft-wysiwyg';
 import { EditorState, convertToRaw, convertFromRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import axios from 'axios';
-
-const { Option } = Select;
 
 const content = {"entityMap":{},"blocks":[{"key":"637gr","text":"Initialized from content state.","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]};
 
@@ -116,12 +114,6 @@ export default class Posts extends React.Component {
         return (
             <div className="center">
                 <div className="post-container">
-                    <Select defaultValue="facebook" style={{ width: 120 }} onChange={this.handleChange}>
-                        <Option value="fecebook">facebook</Option>
-                        <Option value="linkedin">linkedin</Option>
-                        <Option value="medium">medium</Option>
-                        <Option value="twitter">twitter</Option>
-                    </Select>
                     <Form style={{margin: "20px"}}
                     name="posts"
                     size="large"

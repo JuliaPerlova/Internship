@@ -27,6 +27,12 @@ export class SocialApiService {
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }
 
+    getAll(uId: string) {
+        return this.appClient.send<object>({ cmd: 'get all user profiles' }, uId)
+        .toPromise()
+        .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
+    }
+
     findProfileByPId(provider: string, providerId: string) {
         return this.appClient.send<object>({ cmd: 'find profile by provider id'}, { provider, providerId })
         .toPromise()

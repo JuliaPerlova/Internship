@@ -10,7 +10,7 @@ export class CreateSocialDto {
     readonly avatar: string;
     readonly accessToken: string;
 
-    readonly userId: string;
+    userId: string;
     
     readonly expiredAt: Date;
     readonly createdAt: Date;

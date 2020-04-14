@@ -2,17 +2,18 @@ import { Injectable, Inject } from '@nestjs/common';
 import 'dotenv/config';
 
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-facebook';
+import { Strategy } from 'passport-linkedin-oauth2';
 import { addDays } from 'date-fns';
 
 @Injectable()
-export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
+export class LinkedinStrategy extends PassportStrategy(Strategy, 'linkedin') {
   constructor() {
     super({
-      clientID: process.env.FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-      profileFields: ['id', 'name', 'emails', 'photos']
+      clientID: process.env.LINKEDIN_CLIENT_ID,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+      callbackURL: process.env.LINKEDIN_CALLBACK_URL,
+      scope: ['r_liteprofile', 'r_emailaddress'],
+      profileFields: ['id', 'first-name', 'last-name', 'email-address', 'headline']
     })
   ;}
 
@@ -24,11 +25,15 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       lastName: profile.name.familyName,
       email: profile.emails[0].value,
       providerId: `${profile.id}`,
-      provider: 'facebook',
-      avatar: profile.photos[0].value,
+      provider: 'linkedin',
+      avatar: null,
       accessToken,
       expiredAt,
     };
+
+    if (profile.photos[0]) {
+      providerUserProfile.avatar = profile.photos[0].value;
+    }
 
     return await providerUserProfile;
   }

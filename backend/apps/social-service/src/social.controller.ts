@@ -29,8 +29,8 @@ export class SocialController {
     return this.socialService.updateProfile(provider, providerId, data);
   }
 
-  @MessagePattern({ cmd: 'get all user profiles'})
-  getAll({ uId }): Promise<ISocial[]> {
+  @MessagePattern({ cmd: 'get all user profiles' })
+  getAll(uId: string): Promise<ISocial[]> {
     return this.socialService.getAll(uId);
   }
 
