@@ -43,7 +43,7 @@ export class SocialService {
     return await this.socialModel.findByIdAndDelete({provider, providerId}).exec();
   }
 
-  async deleteAll(uId: string): Promise<{ ok?: number, n?: number }> {
+  async deleteAll(uId: string): Promise<ISocial[]> {
     return await this.socialModel.deleteMany({ uId }).exec();
   }
   

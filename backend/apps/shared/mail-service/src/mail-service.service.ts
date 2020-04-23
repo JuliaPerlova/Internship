@@ -36,4 +36,26 @@ export class MailServiceService {
         }).then(() => console.log('success!')).catch((err) => console.log(err));
     }
 
+    async successPublish(email: string, link: string) {
+        return await MailServiceService.transporter.sendMail({
+            from: process.env.EMAIL,
+            to: email,
+            subject: 'Successful publication',
+            html: `<h3>We are happy to notify you that your post was successfully published!</h3> 
+                   <p>You can watch your post due to ${link}</p><br>
+                   <p>If something is wrong about your post, then please contact our support</p>`
+        }).then(() => console.log('success!')).catch((err) => console.log(err));
+    }
+
+    async failPublish(email: string) {
+        return await MailServiceService.transporter.sendMail({
+            from: process.env.EMAIL,
+            to: email,
+            subject: 'Failed publication',
+            html: `<h3>We are sorry to notify you that your post was not published</h3> 
+                   <p>You can find your post in archives and try to publish it again</p><br>
+                   <p>If something is wrong about your post, then please contact our support</p>`
+        }).then(() => console.log('success!')).catch((err) => console.log(err));
+    }
+
 }

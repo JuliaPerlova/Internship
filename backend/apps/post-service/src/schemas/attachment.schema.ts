@@ -4,6 +4,7 @@ import { contentEnum } from '../enums/content.enum';
 export const AttachmentSchema = new mongoose.Schema({
     link: { type: String, required: true },
     fileId: { type: String, required: true },
+    fileSize: { type: String, default: null },
     contentType: { type: String, required: true, enum: Object.values(contentEnum) },
 });
 
