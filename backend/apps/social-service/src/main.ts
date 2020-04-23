@@ -7,7 +7,7 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: 'localhost',
-      port: 8050,
+      port: 8040,
     },
   });
   await app.listen(() => console.log('Microservice Social is listening'));

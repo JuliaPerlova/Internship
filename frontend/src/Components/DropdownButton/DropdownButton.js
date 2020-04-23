@@ -18,6 +18,7 @@ export default class DropdownButton extends React.Component {
     timezone: null,
     avatar: null,
     avatarId: null,
+    changePassIsClicked: false,
   }
 
   handleOk = () => {
@@ -110,6 +111,12 @@ handleInputTime = (value) => {
   })
 }
 
+handleChangePass = () => {
+  this.setState({
+    changePassIsClicked: !this.changePassIsClicked
+  })
+}
+
 onFinish = () => {
   const data = {
     firstName: this.state.firstname,
@@ -173,24 +180,31 @@ onFinish = () => {
               <Input prefix={<SolutionOutlined />} placeholder={this.state.lastname} name="lastname" onChange={this.handleInputChange} />
             </Form.Item>
 
-            <Form.Item
-            name="changepass"
-            hasFeedback
-            rules={[
-                {
-                    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,20}$/m,
-                    message: 'Password must contain capital, lowercase letters and numbers and also have length of 8 to 20 characters',
-                }
-            ]}
-            >
+            {
+              this.state.changePassIsClicked ? 
+              <Form.Item
+              name="changepass"
+              hasFeedback
+              rules={[
+                  {
+                      pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,20}$/m,
+                      message: 'Password must contain capital, lowercase letters and numbers and also have length of 8 to 20 characters',
+                  }
+              ]}
+              >
                 <Input.Password prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 placeholder="Change password"
                 name="changepass" 
                 onChange={this.handleInputChange}
                 />
+              </Form.Item> 
+                :
+              <Form.Item>
+              <Button type="primary" onClick={this.handleChangePass}>Change password</Button>
             </Form.Item>
-
+            }
+            
             <Form.Item>
               <TimezonePicker
               name="timezone"

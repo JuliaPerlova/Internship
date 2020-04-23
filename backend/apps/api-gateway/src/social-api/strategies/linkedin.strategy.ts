@@ -17,8 +17,10 @@ export class LinkedinStrategy extends PassportStrategy(Strategy, 'linkedin') {
     })
   ;}
 
-  async validate(accessToken: string, refreshToken: string, profile: any) {
+  validate(accessToken: string, refreshToken: string, profile: any) {
     const expiredAt = addDays(Date.now(), 60);
+
+    const avatar = (profile.photos[0]) ? profile.photos[0].value : null;
 
     const providerUserProfile = {
       firstName: profile.name.givenName,
@@ -26,15 +28,11 @@ export class LinkedinStrategy extends PassportStrategy(Strategy, 'linkedin') {
       email: profile.emails[0].value,
       providerId: `${profile.id}`,
       provider: 'linkedin',
-      avatar: null,
+      avatar,
       accessToken,
       expiredAt,
     };
 
-    if (profile.photos[0]) {
-      providerUserProfile.avatar = profile.photos[0].value;
-    }
-
-    return await providerUserProfile;
+    return providerUserProfile;
   }
 }

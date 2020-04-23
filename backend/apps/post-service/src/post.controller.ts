@@ -13,13 +13,13 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @MessagePattern({ cmd: 'get template'})
-  getTemplate(providers: string[]) {
+  getTemplate({ providers }) {
     return this.postService.getTemplates(providers);
   }
 
   @MessagePattern({ cmd: 'create post' })
-  async newPost({ createPostDto, template }): Promise<IPost> {
-    return this.postService.createPost(createPostDto, template);
+  async newPost({ data, template }): Promise<IPost> {
+    return this.postService.createPost(data, template);
   }
 
   @MessagePattern({ cmd: 'update post' })

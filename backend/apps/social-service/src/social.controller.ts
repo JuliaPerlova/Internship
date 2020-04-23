@@ -31,6 +31,7 @@ export class SocialController {
 
   @MessagePattern({ cmd: 'get all user profiles' })
   getAll(uId: string): Promise<ISocial[]> {
+    console.log(uId);
     return this.socialService.getAll(uId);
   }
 
@@ -40,7 +41,7 @@ export class SocialController {
   }
 
   @MessagePattern({ cmd: 'delete user profiles' })
-  deleteAll({ uId }): Promise<ISocial[]> {
+  deleteAll({ uId }): Promise<{ ok?: number, n?: number }> {
     return this.socialService.deleteAll(uId);
   }
 }

@@ -40,10 +40,10 @@ export class SocialService {
   }
 
   async deleteProfile(provider: string, providerId: string): Promise<ISocial> {
-    return await this.socialModel.findByIdAndDelete(provider, providerId).exec();
+    return await this.socialModel.findByIdAndDelete({provider, providerId}).exec();
   }
 
-  async deleteAll(uId: string): Promise<ISocial[]> {
+  async deleteAll(uId: string): Promise<{ ok?: number, n?: number }> {
     return await this.socialModel.deleteMany({ uId }).exec();
   }
   

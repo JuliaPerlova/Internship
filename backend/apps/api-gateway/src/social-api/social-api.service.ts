@@ -10,7 +10,7 @@ export class SocialApiService {
             transport: Transport.TCP, 
             options: {
                 host: 'localhost',
-                port: 8050,
+                port: 8040,
             },
         });
     }

@@ -15,8 +15,8 @@ export class PostApiService {
         });
     }
 
-    getTemplate(providers: string[]) {
-        return this.appClient.send<string>({ cmd: 'get template' }, providers)
+    getTemplate(token: string, providers: string[]) {
+        return this.appClient.send<string>({ cmd: 'get template' }, { token, providers })
         .toPromise()
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN )});
     } 

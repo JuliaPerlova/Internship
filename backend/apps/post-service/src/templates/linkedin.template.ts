@@ -8,7 +8,7 @@ const linkedinPostTemplate = {
     },
     html: false,
     text: true,
-    maxTextLength: 13000,
+    maxTextLength: 1300,
 };
 
 export default linkedinPostTemplate;

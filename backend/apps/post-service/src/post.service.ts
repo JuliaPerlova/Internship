@@ -20,7 +20,7 @@ export class PostService {
   getTemplates(providers: string[]) {
     return providers.map((provider) => {
       return PostService.templates.filter((t) => t.provider === provider)[0];
-    });
+    })[0];
   }
 
   async createPost(createPostDto: CreatePostDto, template: CreateTemplateDto[]): Promise<IPost> {

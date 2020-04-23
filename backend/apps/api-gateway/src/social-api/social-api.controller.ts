@@ -47,10 +47,7 @@ export class SocialApiController {
 
         if (findUser) {
             console.log(findUser);
-            return this.appService.updateProfile(req.user.provider, req.user.providerId, { 
-                accessToken: req.user.accessToken, 
-                expiredAt: req.user.expiredAt 
-            });
+            return this.appService.updateProfile(req.user.provider, req.user.providerId, req.user);
         }
 
         return this.appService.createConnection(req.user);
