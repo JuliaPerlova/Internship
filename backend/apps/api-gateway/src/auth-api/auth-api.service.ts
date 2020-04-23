@@ -15,8 +15,8 @@ export class AuthApiService {
         });
     }
 
-    login(data: object) {
-        return this.authClient.send<object>({ cmd: 'login' }, data)
+    async login(data: object) {
+        return await this.authClient.send<object>({ cmd: 'login' }, data)
         .toPromise()
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }

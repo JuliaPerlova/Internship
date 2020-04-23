@@ -1,0 +1,12 @@
+.post-container {
+    width: 650px;
+    background: #edf2f8;
+    box-shadow: 1px 1px 7px 0px rgb(166, 191, 217, 0.6);
+    text-align: center;
+}
+
+.rdw-editor-main {
+    height: 200px !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+}

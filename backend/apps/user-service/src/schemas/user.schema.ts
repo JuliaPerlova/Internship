@@ -7,6 +7,8 @@ export const UserSchema = new mongoose.Schema({
     login: { type: String, required: true, index: true, unique: true },
     password: { type: String, required: true },
     email: { type: String, required: true, index: true, unique: true },
+    firstName: { type: String, default: null },
+    lastName: { type: String, default: null },
     gender: { type: String, enum: Object.values(genderEnum) },
     phone: { type: String, default: null },
     address: {
@@ -20,4 +22,5 @@ export const UserSchema = new mongoose.Schema({
     status: { type: String, required: true, enum: Object.values(statusEnum) },
     role: { type: String, required: true, enum: Object.values(rolesEnum) },
     createdAt: { type: Date, default: new Date },
+    timeZone: { type: String, default: 'Europe/Kiev' },
 });

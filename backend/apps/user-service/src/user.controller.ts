@@ -1,31 +1,35 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
+import { AuthGuard } from '../../shared/guards/auth.guard';
+
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { IUser } from './interfaces/user.interface';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('user')
+@UseGuards(AuthGuard)
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @MessagePattern({ cmd: 'getAllUsers' })
+    @MessagePattern({ cmd: 'get all users' })
     getAllUsers(): Promise<IUser[]> {
         return this.userService.getAllUsers();
     }
 
-    @MessagePattern({ cmd: 'findUser' })
-    findUser(userId: string): Promise<IUser> {
-        return this.userService.findUser(userId);
+    @MessagePattern({ cmd: 'find user' })
+    findUser({ uId }): Promise<IUser> {
+        return this.userService.findUser(uId);
     }
 
-    @MessagePattern({ cmd: 'updateUser' })
-    updateUser(userId: string, newData: CreateUserDto): Promise<IUser> {
-        return this.userService.updateUser(userId, newData);
+    @MessagePattern({ cmd: 'update user' })
+    @UsePipes(ValidationPipe)
+    updateUser({ uId, data }: { uId: string, data: CreateUserDto }): Promise<IUser> {
+        return this.userService.updateUser(uId, data);
     }
 
-    @MessagePattern({ cmd: 'deleteUser' })
-    deleteUser(userId: string): Promise<IUser> {
-        return this.userService.deleteUser(userId);
+    @MessagePattern({ cmd: 'delete user' })
+    deleteUser({ uId }): Promise<IUser> {
+        return this.userService.deleteUser(uId);
     }
 }

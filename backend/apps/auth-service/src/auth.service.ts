@@ -30,7 +30,7 @@ export class AuthService {
     private async mailSend(email: string, message: string, token: string) {
         switch(message) {
             case 'New User': 
-                await this.mailService.confirmEmail(email, token,);
+                await this.mailService.confirmEmail(email, token);
                 break;
             case 'Forgot Password':
                 await this.mailService.changePass(email, token);
@@ -51,12 +51,6 @@ export class AuthService {
     private async createToken(createUserTokenDto: CreateUserTokenDto) {
         return await this.tokenService.create(createUserTokenDto);
     }
-
-    private async hashPass(password: string) {
-        const salt = await bcrypt.genSalt(10);
-        return await bcrypt.hash(password, salt);
-    }
-
 
     async signIn({ email, password }: LoginDto) {
         const user = await this.userService.findUserByEmail(email);
@@ -95,13 +89,9 @@ export class AuthService {
         if(findLogin) {
             throw new RpcException('This username is taken. Try another');
         }
-        
-        const pass = createUserDto.password;
 
-        const password = await this.hashPass(pass);
-        const saltUser = { ...createUserDto, password };
         const user = await this.userService.createUser(
-            saltUser,
+            createUserDto,
             rolesEnum.user, 
             statusEnum.pending,
         );
@@ -146,11 +136,9 @@ export class AuthService {
         return true;
     }
 
-    async changePass(token: string, pass: string) {
+    async changePass(token: string, password: string) {
         const userId = (await this.tokenService.find(token)).uId;
         await this.tokenService.deleteAll(userId);
-
-        const password = await this.hashPass(pass); 
         await this.userService.updateUser(userId, { password });
 
         return true;

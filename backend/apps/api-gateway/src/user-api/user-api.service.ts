@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ClientProxy, Transport, ClientProxyFactory } from '@nestjs/microservices';
 
 @Injectable()
@@ -15,24 +15,21 @@ export class UserApiService {
         })
     }
 
-    createUser(data: object) {
-        return this.userClient.send<object>({ cmd: 'createUser'}, data);
-    }
-    
-    getAllUsers() {
-        return this.userClient.send<string>({ cmd: 'getAllUsers' }, {});
-    }
-    
-    findUser(id: string) {
-        return this.userClient.send<string>({ cmd: 'findUser'}, id);
-    }
-    
-    updateUser(id: string, newData: object) {
-        return this.userClient.send<object>({ cmd: 'updateUser' }, { id,  ...newData });
-    }
-    
-    deleteUser(id: string) {
-        return this.userClient.send<string>({ cmd: 'deleteUser' }, id);
+    getUser(token: string, uId: string) {
+        return this.userClient.send<object>({ cmd: 'find user' }, { token, uId })
+        .toPromise()
+        .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
     }
 
+    updateUser(token: string, uId: string,  data: object) {
+        return this.userClient.send<object>({ cmd: 'update user' }, { token, uId, data })
+        .toPromise()
+        .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
+    }
+
+    deleteUser(token: string, uId: string) {
+        return this.userClient.send<object>({ cmd: 'delete user' }, { token, uId })
+        .toPromise()
+        .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN) });
+    }
 }

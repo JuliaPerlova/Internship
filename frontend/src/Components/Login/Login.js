@@ -10,8 +10,7 @@ export default class Login extends React.Component {
     state = {
         email: null,
         password: null,
-        uId: null,
-        token: null,
+        isAuth: false,
     }
 
     handleInputChange = (event) => {
@@ -28,10 +27,11 @@ export default class Login extends React.Component {
         }
         return axios.post('http://localhost:4000/auth/login', data).then((response) => {
             console.log(response);
-            const { uId, token } = response.data;
+            const { token, uId } = response.data;
+            localStorage.setItem('uId', uId);
+            localStorage.setItem('token', token);
             this.setState({
-                uId: uId,
-                token: token,
+                isAuth: !this.isAuth
             })
           })
           .catch((error) => {
@@ -42,12 +42,13 @@ export default class Login extends React.Component {
 
     render() {
         return (
-            this.state.token ? <Redirect to={`/main/token=${this.state.token}`} /> :
+            localStorage.getItem('token') ? <Redirect to={"/main"} /> :
             <div className="center">
                 <h1>Welcome back!</h1>
                 <p>Please log in to your account</p>
                 <div className="container">
                     <Form style={{margin: "20px"}}
+                    onFinish={this.responseHandler}
                     name="login"
                     className="login-form"
                     size="large"
@@ -88,7 +89,7 @@ export default class Login extends React.Component {
                                 />
                         </Form.Item>
                         <Form.Item>
-                                <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.responseHandler}>
+                                <Button type="primary" className="login-form-button" htmlType="submit">
                                 Log in
                                 </Button>
                         </Form.Item>

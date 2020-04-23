@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsDate, Matches, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsString, Matches, IsNotEmpty } from 'class-validator';
 import { IAddress } from "../interfaces/address.interface";
 
 
@@ -8,7 +8,7 @@ export class CreateUserDto {
 
     @Matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/m, 
-        { message: 'Weak password'},
+        { message: 'Weak password' },
     )
     readonly password: string;
 
@@ -18,12 +18,15 @@ export class CreateUserDto {
 
     readonly status: string;
     readonly gender: string;
+    readonly firstName: string;
+    readonly lastName: string;
     readonly avatar: string;
     readonly avatarId: string;
     readonly phone: string;
     readonly role: string;
     readonly createdAt: Date;
     readonly address: IAddress;
+    readonly timeZone: string;
     readonly _id: string;
 
 }

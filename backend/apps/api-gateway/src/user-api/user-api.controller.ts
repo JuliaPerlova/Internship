@@ -1,33 +1,24 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
-
+import { Controller, Get, Post, Body, Param, Patch, Delete, UseFilters } from '@nestjs/common';
+import { HttpExceptionFilter } from '../../../shared/filters/src/http-exception.filter';
 import { UserApiService } from './user-api.service';
 
 @Controller()
+@UseFilters(HttpExceptionFilter)
 export class UserApiController {
     constructor(private readonly appService: UserApiService) {}
 
-    @Post('/user/new')
-    createUser(@Body() data: object) {
-        return this.appService.createUser(data);
+    @Post('/main/settings')
+    getUser(@Body() { token, uId }) {
+        return this.appService.getUser(token, uId);
     }
 
-    @Get('/users')
-    getAllUsers() {
-        return this.appService.getAllUsers();
+    @Patch('/main/settings')
+    updateUser(@Body() { token, uId, data }) {
+        return this.appService.updateUser(token, uId, data);
     }
 
-    @Get('/user/find/:id')
-    findUser(@Param('id') userId: string) {
-        return this.appService.findUser(userId);
-    }
-
-    @Patch('/user/:id/update')
-    updateUser(@Param('id') userId: string, @Body() newData: object) {
-        return this.appService.updateUser(userId, newData);
-    }
-
-    @Delete('/user/:id/delete')
-    deleteUser(@Param('id') id: string) {
-        return this.appService.deleteUser(id);
+    @Delete('/main/settings')
+    deleteUser(@Body() { token, uId }) {
+        return this.appService.deleteUser(token, uId);
     }
 }
