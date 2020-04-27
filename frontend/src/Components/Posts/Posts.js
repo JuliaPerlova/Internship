@@ -30,6 +30,7 @@ export default class Posts extends React.Component {
             providerId: [...this.props.providerId],
             provider: [...this.props.provider],
             template: {},
+            postArticleTumbler: 'post'
         }
     }
 
@@ -66,15 +67,22 @@ export default class Posts extends React.Component {
     };
 
     beforeUpload = (file) => {
+        if (!this.state.template.video) {
+            if (file.type === 'video/mp4') {
+                message.error(`Sorry, but you can't download video on ${this.state.template.provider}`);
+                return false;
+            }
+        }
+
         const isJpgOrPngOrMp4 = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'video/mp4';
         if (!isJpgOrPngOrMp4) {
           message.error('You can only upload JPG/PNG/MP4 file!');
         }
-        const isLt2M = file.size / 1024 / 1024 < 50;
-        if (!isLt2M) {
-          message.error('File must be smaller than 50MB!');
+        const isLt100M = file.size / 1024 / 1024 < 100;
+        if (!isLt100M) {
+          message.error('File must be smaller than 100MB!');
         }
-        return isJpgOrPngOrMp4 && isLt2M;
+        return isJpgOrPngOrMp4 && isLt100M;
     };
 
     upload = (event) => {
@@ -101,24 +109,24 @@ export default class Posts extends React.Component {
           })
     }
 
-    uploadVideo = (event) => {
-        console.log(event.file);
-        const data = new FormData()
-        data.append('file', event.file)
-        data.append('upload_preset', 'tnd5cvzb')
-        return axios.post('https://api.cloudinary.com/v1_1/deobpvcce/video/upload', data)
-          .then((res) => {
-            console.log(res)
-            this.setState({
-              video: res.data.url,
-              videoId: res.data.public_id
-            })
-            console.log(this.state)
-          })
-          .catch((err) => {
-            console.error(err)
-        })
-    }
+    // uploadVideo = (event) => {
+    //     console.log(event.file);
+    //     const data = new FormData()
+    //     data.append('file', event.file)
+    //     data.append('upload_preset', 'tnd5cvzb')
+    //     return axios.post('https://api.cloudinary.com/v1_1/deobpvcce/video/upload', data)
+    //       .then((res) => {
+    //         console.log(res)
+    //         this.setState({
+    //           video: res.data.url,
+    //           videoId: res.data.public_id
+    //         })
+    //         console.log(this.state)
+    //       })
+    //       .catch((err) => {
+    //         console.error(err)
+    //     })
+    // }
 
     handleChange = (value) => {
         console.log(value);
@@ -176,27 +184,36 @@ export default class Posts extends React.Component {
         return arr;
     }
 
+    tumbler = (key) => {
+        if (key === 'post') {
+            this.setState({postArticleTumbler: 'post'});
+        } else {
+            this.setState({postArticleTumbler: 'article'});
+        }
+    }
+
     onFinish = () => {
         const token = localStorage.getItem('token');
         const template = this.state.template;
-        const data = {
+        const post = {
             
-            providerId: this.state.providerId[0],
+            providers: { provider: this.state.provider[0], providerId: this.state.providerId[0] },
             uId: localStorage.getItem('uId'),
             title: this.state.title,
             body : {
-                text: this.state.template.html ? draftToHtml(convertToRaw(this.editorState.getCurrentContent())) :
+
+                text: this.state.postArticleTumbler === 'article' ? draftToHtml(convertToRaw(this.editorState.getCurrentContent())) :
                     this.rawToText(this.state.contentState),
                 attachments: this.state.attachments
             }
         }
-        return axios.post('http://localhost:4000/main/posts/new', { token, data, template })
+        return axios.post('http://localhost:4000/main/schedule/new', { post, template, date: null })
             .then((res) => console.log(res))
             .catch((err) => console.error(err));
     }
 
     render() {
-        console.log(this.state.template.provider);
+        console.log(this.state);
         const { editorState } = this.state;
         const textHtml = draftToHtml(convertToRaw(editorState.getCurrentContent()))
         console.log(textHtml)
@@ -211,58 +228,59 @@ export default class Posts extends React.Component {
                     size="large"
                     onFinish={this.onFinish}
                     >
-                        {
-                            this.state.template.title ? <Form.Item
-                                                            rules={[
-                                                                {
-                                                                    required: true,
-                                                                    message: 'Please input title'
-                                                                }
-                                                            ]}
-                                                            >
-                                                                <Input placeholder="Title" name="title" />
-                                                        </Form.Item>
-                                                        :
-                                                        null
-                        }
-                        {
-                            !this.state.template.html ? <Form.Item>
-                                                            <Editor
-                                                            editorClassName="ant-input"
-                                                            toolbarHidden
-                                                            toolbar={
-                                                                {
-                                                                    options: ['inline', 'fontSize', 'fontFamily', 'textAlign', 'link', 'emoji', 'image'],
-                                                                }
-                                                            }
-                                                            hashtag={{
-                                                                separator: ' ',
-                                                                trigger: '#',
-                                                            }}
-                                                            editorState={editorState}
-                                                            onEditorStateChange={this.onEditorStateChange}
-                                                            onContentStateChange={this.onContentStateChange}
-                                                            />
-                                                        </Form.Item>
-                                                        :
-                                                        <Form.Item>
-                                                            <Editor
-                                                            editorClassName="ant-input"
-                                                            toolbar={
-                                                                {
-                                                                    options: ['inline', 'fontSize', 'fontFamily', 'textAlign', 'link', 'emoji', 'image'],
-                                                                }
-                                                            }
-                                                            hashtag={{
-                                                                separator: ' ',
-                                                                trigger: '#',
-                                                            }}
-                                                            editorState={editorState}
-                                                            onEditorStateChange={this.onEditorStateChange}
-                                                            onContentStateChange={this.onContentStateChange}
-                                                            />
-                                                        </Form.Item>
-                        }
+                        <Form.Item>
+                            <Tabs size="large" onChange={this.tumbler}>
+                                <TabPane tab="Post" key="post" disabled={!this.state.template.text}>
+                                    <Form.Item>
+                                        <Editor
+                                        editorClassName="ant-input"
+                                        toolbarHidden
+                                        toolbar={
+                                            {
+                                                options: ['inline', 'fontSize', 'fontFamily', 'textAlign', 'link', 'emoji', 'image'],
+                                            }
+                                        }
+                                        hashtag={{
+                                            separator: ' ',
+                                            trigger: '#',
+                                        }}
+                                        //editorState={editorState}
+                                        //onEditorStateChange={this.onEditorStateChange}
+                                        onContentStateChange={this.onContentStateChange}
+                                        />
+                                    </Form.Item>
+                                </TabPane>
+                                <TabPane tab="Article" key="article" disabled={!this.state.template.html}>
+                                    <Form.Item
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Please input title'
+                                        }
+                                    ]}
+                                    >
+                                        <Input placeholder="Title" name="title" />
+                                    </Form.Item>
+                                    <Form.Item>
+                                        <Editor
+                                        editorClassName="ant-input"
+                                        toolbar={
+                                            {
+                                                options: ['inline', 'fontSize', 'fontFamily', 'textAlign', 'link', 'emoji', 'image'],
+                                            }
+                                        }
+                                        hashtag={{
+                                            separator: ' ',
+                                            trigger: '#',
+                                        }}
+                                        editorState={editorState}
+                                        onEditorStateChange={this.onEditorStateChange}
+                                        //onContentStateChange={this.onContentStateChange}
+                                        />
+                                    </Form.Item>
+                                </TabPane>
+                            </Tabs>
+                        </Form.Item>
                         
                         <Form.Item>
                         <Upload customRequest={this.upload} showUploadList={false} beforeUpload={this.beforeUpload}>

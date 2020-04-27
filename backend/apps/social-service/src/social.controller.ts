@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Body } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
 import { SocialService } from './social.service';
@@ -8,6 +8,11 @@ import { ISocial } from './interfaces/social.interface';
 @Controller()
 export class SocialController {
   constructor(private readonly socialService: SocialService) {}
+
+  @MessagePattern({ cmd: 'create share' })
+  createShare(@Body() data) {
+    return data;
+  } 
 
   @MessagePattern({ cmd: 'create connection' })
   createConnection(createSocialDto: CreateSocialDto) {

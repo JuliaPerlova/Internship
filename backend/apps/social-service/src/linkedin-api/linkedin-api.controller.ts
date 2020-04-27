@@ -6,7 +6,7 @@ import * as request from 'request';
 import * as fetch from 'node-fetch';
 
 import { LinkedinApiService } from './linkedin-api.service';
-import { CreateAttachDto } from '../../../../post-service/src/dto/attachment.dto';
+import { CreateAttachDto } from '../../../post-service/src/dto/attachment.dto';
 
 @Controller()
 export class LinkedinApiController {
@@ -14,14 +14,16 @@ export class LinkedinApiController {
 
     async upload(image: CreateAttachDto, url: string, headers: object) {
         const { link, fileId, contentType } = image;
-        const imgName = `${fileId}.${contentType}`;
+        const arr = link.split('/');
+        const imgName = arr[arr.length - 1];
 
+        console.log(imgName);
         const stream = request(link).pipe(fs.createWriteStream(imgName));
         await stream.on('close', async () => {
             return await fs.readFile(imgName, async(err, data) => {
                 if (err) throw err;
 
-                const encodedImage = new Buffer(data);
+                const encodedImage = Buffer.from(data);
 
                 await fetch(url, {
                     method: 'PUT',
@@ -32,8 +34,21 @@ export class LinkedinApiController {
         });
     }
 
+    @MessagePattern({ cmd: 'linkedin check status' })
+    async checkStatus({ asset, accessToken }) {
+        await fetch(`https://api.linkedin.com/v2/assets/${asset}`, {
+            method: 'GET',
+            'Authorization': `Bearer ${accessToken}`
+        }).then(async(res) => {
+            const response = await res.text();
+            const parsed = JSON.parse(response);
+            const status = parsed.status;
+            return status;
+        });
+    }
+
     @MessagePattern({ cmd: 'linkedin upload image' })
-    async uploadImage({ image, providerId, accessToken }) {
+    async uploadImage({ attach, providerId, accessToken }) {
         const { body, headers } = this.linkedinService.registerImage(providerId, accessToken);
 
         let uploadUrl;
@@ -46,26 +61,29 @@ export class LinkedinApiController {
         })
         .then(async (res) => {
             const response = await res.text();
-            const data = response
+            const parsed = JSON.parse(response);
+            const data = parsed
                 .value
                 .uploadMechanism["com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"];
 
             uploadUrl = data.uploadUrl;
-            asset = response.value.asset;
+            asset = parsed.value.asset;
         });
+        const header = {
+            'Authorization': `Bearer ${accessToken}`
+        };
 
-        await this.upload(image, uploadUrl, headers[0]);
+        await this.upload(attach, uploadUrl, header);
 
         return asset;
 
     }
 
     @MessagePattern({ cmd: 'linkedin create share'})
-    async createShare({ post, accessToken, links }) {
-        console.log({ post, accessToken, links })
+    async createShare({ post, providerId, accessToken, links }) {
         const data = (links.length === 0) ? 
-            this.linkedinService.createShare(post, accessToken):
-            this.linkedinService.createShare(post, accessToken, links);
+            this.linkedinService.createShare(post, providerId, accessToken):
+            this.linkedinService.createShare(post, providerId, accessToken, links);
 
         const { body, headers } = data;
 

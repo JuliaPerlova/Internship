@@ -1,12 +1,12 @@
 const linkedinPostTemplate = {
     provider: 'linkedin',
-    title: false,
+    title: true,
     attachments: {
         image: true,
-        video: true,
+        video: false,
         maxAttachLength: 9,
     },
-    html: false,
+    html: true,
     text: true,
     maxTextLength: 1300,
 };

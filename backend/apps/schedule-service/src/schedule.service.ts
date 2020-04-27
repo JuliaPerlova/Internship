@@ -5,13 +5,13 @@ import { AgendaService } from 'nestjs-agenda';
 
 import { CreatePostDto } from '../../post-service/src/dto/post.dto';
 import { PostService } from '../../post-service/src/post.service';
+import { CreateTemplateDto } from '../../post-service/src/dto/template.dto';
 import { UserService } from '../../user-service/src/user.service';
 import { MailServiceService } from '../../shared/mail-service/src/mail-service.service';
 import { SocialService } from '../../social-service/src/social.service';
 
 import { ISchedule } from './interfaces/schedule.interface';
 import { statusEnum } from './enums/status.enum';
-import { CreateTemplateDto } from 'post-service/src/dto/template.dto';
 
 @Injectable()
 export class ScheduleService {
@@ -28,7 +28,7 @@ export class ScheduleService {
       transport: Transport.TCP,
       options: {
         host: 'localhost',
-        port: 4000,
+        port: 8040,
       },
     });
   }
@@ -40,18 +40,18 @@ export class ScheduleService {
   ): Promise<ISchedule> {
 
     const newPost = await this.postService.createPost(createPostDto, template);
-    const { _id, uId, providerId } = newPost;
+    const { _id, uId, providers } = newPost;
 
     const schedule = await new this.scheduleModel({ 
       uId, 
-      providerId, 
+      providers, 
       postId: _id, 
       notify: false, 
       startsAt: date,
       status: statusEnum.waiting 
     }).save();
 
-    this.publishSchedule(schedule._id, date);
+    await this.publishSchedule(schedule._id, date);
 
     return schedule;
 
@@ -89,36 +89,32 @@ export class ScheduleService {
     }
   }
 
+  private async checkStatus(provider, asset, accessToken) {
+    return await this.apiClient.send<object>(
+      { cmd: `${provider} check status`}, 
+      {asset, accessToken}
+    );
+  }
+
   private async createPost(scheduleId: string) {
     const schedule = await this.findOne(scheduleId);
     const [post, template] = await this.postService.findOne(schedule.postId);
     const { email } = await this.userService.findUser(schedule.uId);
-    let images = null;
 
     Promise.all(schedule.providers.map(async({ provider, providerId }) => {
       const { accessToken } = await this.socialService.findProfileByPId(provider, providerId);
-      
-      if (template.attachments.video) {
-        const link = await this.apiClient.send<object>(
-          { cmd: `${provider} create video share` }, 
-          { post, providerId, accessToken },
-        );
-        return this.sendEmail(email, 'success', link);
-      }
 
-      if (template.attachments.image) {
-        images = await Promise.all(post.body.attachments.map(async(img) => {
-          await this.apiClient.send<object>(
-            { cmd: `${provider} upload image`}, 
-            { img, providerId, accessToken },
-          );
-        }));
-      }
+      const attachments = await Promise.all(post.body.attachments.map(async(attach) => {
+        return await this.apiClient.send<object>(
+          { cmd: `${provider} upload image`}, 
+          { attach, providerId, accessToken },
+        ).toPromise().then((data) => data);
+      }));
 
       const link = await this.apiClient.send<object>(
         { cmd: `${provider} create share`},
-        { post, providerId, accessToken, links: images },
-      );
+        { post, providerId, accessToken, links: attachments },
+      ).toPromise().then((data) => data);
 
       return this.sendEmail(email, 'success', link);
     }))
@@ -134,6 +130,7 @@ export class ScheduleService {
 
   async publishSchedule(scheduleId, date) {
     if(!date) {
+      console.log(date);
       return await this.createPost(scheduleId);
     }
 

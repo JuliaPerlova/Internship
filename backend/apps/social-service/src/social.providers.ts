@@ -5,6 +5,6 @@ export const socialProviders = [
   {
     provide: 'SOCIAL_MODEL',
     useFactory: (connection: Connection) => connection.model('Social', SocialSchema),
-    inject: ['DATABASE_CONNECTION4'],
+    inject: ['DATABASE_SOCIAL_CONNECTION'],
   },
 ]

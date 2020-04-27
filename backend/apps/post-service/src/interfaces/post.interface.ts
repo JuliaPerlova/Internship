@@ -1,8 +1,9 @@
 import { Document } from 'mongoose';
 import { IPostBody } from './body-post.interface';
+import { IProviders } from './providers.interface';
 
 export interface IPost extends Document {
-    readonly providerId: string,
+    readonly providers: IProviders[],
     readonly uId: string,
     readonly title: string,
     readonly body: IPostBody,

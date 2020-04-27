@@ -15,8 +15,8 @@ export class ScheduleApiService {
         });
     }
 
-    createSchedule(post: object, date: Date) {
-        return this.appClient.send<string>({ cmd: 'create schedule' }, { post, date })
+    createSchedule(post: object, template: object, date: Date) {
+        return this.appClient.send<string>({ cmd: 'create schedule' }, { post, template, date })
         .toPromise()
         .catch((err) => { throw new HttpException(err, HttpStatus.FORBIDDEN )});
     } 

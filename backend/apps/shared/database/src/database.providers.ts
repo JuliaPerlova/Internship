@@ -3,7 +3,7 @@ import 'dotenv/config';
 
 export const databaseProviders = [
   {
-    provide: 'DATABASE_CONNECTION1',
+    provide: 'DATABASE_USER_CONNECTION',
     useFactory: (): Promise<typeof mongoose> =>
       mongoose.connect(process.env.MONGO_URI, { 
         useNewUrlParser: true,
@@ -14,7 +14,7 @@ export const databaseProviders = [
   },
 
   {
-    provide: 'DATABASE_CONNECTION2',
+    provide: 'DATABASE_TOKEN_CONNECTION',
     useFactory: (): Promise<typeof mongoose> =>
       mongoose.connect(process.env.MONGO_URI, { 
         useNewUrlParser: true,
@@ -25,7 +25,7 @@ export const databaseProviders = [
   },
 
   {
-    provide: 'DATABASE_CONNECTION3',
+    provide: 'DATABASE_POST_CONNECTION',
     useFactory: (): Promise<typeof mongoose> =>
       mongoose.connect(process.env.MONGO_URI, { 
         useNewUrlParser: true,
@@ -36,7 +36,7 @@ export const databaseProviders = [
   },
 
   {
-    provide: 'DATABASE_CONNECTION4',
+    provide: 'DATABASE_SOCIAL_CONNECTION',
     useFactory: (): Promise<typeof mongoose> =>
       mongoose.connect(process.env.MONGO_URI, { 
         useNewUrlParser: true,
@@ -47,7 +47,18 @@ export const databaseProviders = [
   },
 
   {
-    provide: 'DATABASE_CONNECTION5',
+    provide: 'DATABASE_TEMPLATE_CONNECTION',
+    useFactory: (): Promise<typeof mongoose> =>
+      mongoose.connect(process.env.MONGO_URI, { 
+        useNewUrlParser: true,
+        useFindAndModify: false,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
+      }),
+  },
+
+  {
+    provide: 'DATABASE_SCHEDULE_CONNECTION',
     useFactory: (): Promise<typeof mongoose> =>
       mongoose.connect(process.env.MONGO_URI, { 
         useNewUrlParser: true,

@@ -3,8 +3,8 @@ import * as fetch from 'node-fetch';
 import * as fs from 'fs';
 import * as request from 'request';
 
-import { CreatePostDto } from '../../../../post-service/src/dto/post.dto';
-import { CreateAttachDto } from '../../../../post-service/src/dto/attachment.dto';
+import { CreatePostDto } from '../../../post-service/src/dto/post.dto';
+import { CreateAttachDto } from '../../../post-service/src/dto/attachment.dto';
 
 import * as linkedinOptions from '../options/linkedin.options';
 
@@ -13,13 +13,14 @@ export class LinkedinApiService {
     constructor() {}
 
     createShare(createPostDto: CreatePostDto, 
+        providerId: string,
         accessToken: string,
         links?: string[]) {
 
-        const { providers, title } = createPostDto;
+        const { title } = createPostDto;
         const { text } = createPostDto.body;
         const { content, body, headers } = linkedinOptions
-            .createBodyShare(title, text, providers.providerId, accessToken);
+            .createBodyShare(title, text, providerId, accessToken);
 
         if (!links) {
             return { body: JSON.stringify(body), headers };

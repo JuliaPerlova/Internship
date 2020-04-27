@@ -10,8 +10,8 @@ export class ScheduleApiController {
     constructor(private readonly appService: ScheduleApiService) {}
 
     @Post('/main/schedule/new') 
-    createSchedule(@Body() { post, date }) {
-        return this.appService.createSchedule(post, date);
+    createSchedule(@Body() { post, template, date }) {
+        return this.appService.createSchedule(post, template, date);
     }
 
     @Post('/main/schedule/update')

@@ -23,7 +23,7 @@ export class PostService {
     })[0];
   }
 
-  async createPost(createPostDto: CreatePostDto, template: CreateTemplateDto[]): Promise<IPost> {
+  async createPost(createPostDto: CreatePostDto, template: CreateTemplateDto): Promise<IPost> {
     const postTemplate = await new this.templateModel(template).save();
     const templateId = postTemplate._id;
     const post = new this.postModel({ ...createPostDto, templateId });

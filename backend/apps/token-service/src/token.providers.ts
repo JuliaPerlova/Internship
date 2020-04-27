@@ -5,6 +5,6 @@ export const tokensProviders = [
   {
     provide: 'USERTOKEN_MODEL',
     useFactory: (connection: Connection) => connection.model('UTokens', UserTokenSchema),
-    inject: ['DATABASE_CONNECTION2'],
+    inject: ['DATABASE_TOKEN_CONNECTION'],
   },
 ]
