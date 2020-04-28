@@ -1,6 +1,6 @@
 import React from 'react';
 import './Posts.css';
-import { Form, Input, Button, message, Upload, Modal, TimePicker, Calendar, Alert, Tabs } from 'antd';
+import { Form, Input, Button, message, Upload, Modal, TimePicker, Calendar, Alert, Tabs, DatePicker } from 'antd';
 import moment from 'moment';
 import { UploadOutlined } from "@ant-design/icons";
 import { Editor } from 'react-draft-wysiwyg';
@@ -30,7 +30,8 @@ export default class Posts extends React.Component {
             providerId: [...this.props.providerId],
             provider: [...this.props.provider],
             template: {},
-            postArticleTumbler: 'post'
+            postArticleTumbler: 'post',
+            date: null,
         }
     }
 
@@ -109,25 +110,6 @@ export default class Posts extends React.Component {
           })
     }
 
-    // uploadVideo = (event) => {
-    //     console.log(event.file);
-    //     const data = new FormData()
-    //     data.append('file', event.file)
-    //     data.append('upload_preset', 'tnd5cvzb')
-    //     return axios.post('https://api.cloudinary.com/v1_1/deobpvcce/video/upload', data)
-    //       .then((res) => {
-    //         console.log(res)
-    //         this.setState({
-    //           video: res.data.url,
-    //           videoId: res.data.public_id
-    //         })
-    //         console.log(this.state)
-    //       })
-    //       .catch((err) => {
-    //         console.error(err)
-    //     })
-    // }
-
     handleChange = (value) => {
         console.log(value);
     }
@@ -152,14 +134,17 @@ export default class Posts extends React.Component {
         });
       };
 
-      onPanelChange = (value) => {
-        const date = new Date(value._d);
-        console.log(date);
+      onChangeTime = (time) => {
+          this.setState({
+              date: time.utc()
+          })
+          console.log(this.state.date);
       }
 
-      onChangeTime = (time, timeString) => {
-          //console.log(time, timeString);
-          console.log(new Date(time._d));
+      onChangeDate = (date) => {
+        this.setState({
+            date: new Date(date._d)
+        })
       }
 
     disDate = (currentDate) => {
@@ -176,6 +161,8 @@ export default class Posts extends React.Component {
     }
 
     disMinutes = () => {
+        const currentHours = moment().format('hh');
+        console.log(currentHours);
         const currentMinutes = moment().format('mm');
         const arr = []
         for(let i = 0; i < currentMinutes; i++) {
@@ -193,10 +180,10 @@ export default class Posts extends React.Component {
     }
 
     onFinish = () => {
-        const token = localStorage.getItem('token');
+        //const token = localStorage.getItem('token');
         const template = this.state.template;
+        const date = this.state.date;
         const post = {
-            
             providers: { provider: this.state.provider[0], providerId: this.state.providerId[0] },
             uId: localStorage.getItem('uId'),
             title: this.state.title,
@@ -207,7 +194,7 @@ export default class Posts extends React.Component {
                 attachments: this.state.attachments
             }
         }
-        return axios.post('http://localhost:4000/main/schedule/new', { post, template, date: null })
+        return axios.post('http://localhost:4000/main/schedule/new', { post, template, date })
             .then((res) => console.log(res))
             .catch((err) => console.error(err));
     }
@@ -244,8 +231,6 @@ export default class Posts extends React.Component {
                                             separator: ' ',
                                             trigger: '#',
                                         }}
-                                        //editorState={editorState}
-                                        //onEditorStateChange={this.onEditorStateChange}
                                         onContentStateChange={this.onContentStateChange}
                                         />
                                     </Form.Item>
@@ -275,7 +260,6 @@ export default class Posts extends React.Component {
                                         }}
                                         editorState={editorState}
                                         onEditorStateChange={this.onEditorStateChange}
-                                        //onContentStateChange={this.onContentStateChange}
                                         />
                                     </Form.Item>
                                 </TabPane>
@@ -294,7 +278,7 @@ export default class Posts extends React.Component {
                             <Button type="primary" htmlType="submit">Create Post Now</Button>
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" onClick={this.showModal}>Create Delayed Post</Button>
+                            <Button type="primary" onClick={this.showModal}>Create Delayed Post</Button>
                             <Modal
                             title="Delayed post"
                             visible={this.state.visible}
@@ -302,7 +286,7 @@ export default class Posts extends React.Component {
                             onCancel={this.handleCancel}
                             footer={false}
                             >
-                                <Tabs defaultActiveKey="1" type="card" size="large">
+                                <Tabs defaultActiveKey="1" type="card">
                                     <TabPane tab="today" key="1">
                                         <p>Enter time of post</p>
                                         <TimePicker 
@@ -312,16 +296,18 @@ export default class Posts extends React.Component {
                                         disabledHours={this.disHours}
                                         disabledMinutes={this.disMinutes} 
                                         />
-                                        <Button type="primary" htmlType="submit">Create Post</Button>
+                                        <Button type="primary" htmlType="submit" onClick={this.onFinish}>Create Post</Button>
                                     </TabPane>
                                     <TabPane tab="later" key="2">
                                         <p>Enter date of post</p>
-                                        <TimePicker 
-                                        format={format}
-                                        onChange={this.onChangeTime}
+                                        <DatePicker
+                                        format="DD-MM-YYYY HH:mm"
+                                        disabledDate={this.disDate}
+                                        defaultValue={moment().add(1, 'd')}
+                                        showTime={{ defaultValue: moment(`${hours}:${minutes}`, format) }}
+                                        onChange={this.onChangeDate}
                                         />
-                                        <Calendar fullscreen={false} onPanelChange={this.onPanelChange} disabledDate={this.disDate} />
-                                        <Button type="primary" htmlType="submit">Create Post</Button>
+                                        <Button type="primary" htmlType="submit" onClick={this.onFinish}>Create Post</Button>
                                     </TabPane>
                                 </Tabs>
                             </Modal>
