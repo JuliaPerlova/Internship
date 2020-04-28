@@ -31,9 +31,6 @@ export class ScheduleService {
         port: 8040,
       },
     });
-
-
-    
   }
   
   async createSchedule(
@@ -41,23 +38,27 @@ export class ScheduleService {
     template: CreateTemplateDto, 
     date: Date,
   ): Promise<ISchedule> {
-    console.log(date);
-
     const newPost = await this.postService.createPost(createPostDto, template);
     const { _id, uId, providers } = newPost;
 
-    const schedule = await new this.scheduleModel({ 
+    const schedule = { 
       uId, 
       providers, 
       postId: _id, 
       notify: false, 
       startsAt: date,
       status: statusEnum.waiting 
-    }).save();
+    };
 
-    await this.publishSchedule(schedule._id, date);
+    if(date) {
+      schedule['startsAt'] = date;
+    }
 
-    return schedule;
+    const createdSchedule = await new this.scheduleModel(schedule).save();
+
+    await this.publishSchedule(createdSchedule._id, date);
+
+    return createdSchedule;
 
   }
 

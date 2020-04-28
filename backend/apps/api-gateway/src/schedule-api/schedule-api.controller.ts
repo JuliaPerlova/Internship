@@ -24,7 +24,7 @@ export class ScheduleApiController {
         return this.appService.getAll(uId);
     }
 
-    @Get('/main/schdule/:scheduleId')
+    @Get('/main/schedule/:scheduleId')
     getOne(@Param('scheduleId') scheduleId: string) {
         return this.appService.findOne(scheduleId);
     }

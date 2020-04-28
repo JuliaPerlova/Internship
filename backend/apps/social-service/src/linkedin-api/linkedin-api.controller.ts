@@ -91,7 +91,12 @@ export class LinkedinApiController {
             method: 'POST',
             body,
             headers,
-        }).then(async(data) => console.log(await data.text())).catch((err) => console.log(err.headers));
+        }).then(async(response) => {
+            const data = await response.text();
+            const parsed = JSON.parse(data);
+            const link = parsed.activity;
+            console.log(link);
+        }).catch((err) => console.log(err.headers));
 
     }
 

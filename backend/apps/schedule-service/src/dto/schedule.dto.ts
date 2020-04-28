@@ -4,4 +4,5 @@ export class CreateScheduleDto {
     readonly postId: string;
     readonly notify: boolean;
     readonly status: string;
+    readonly startsAt: Date;
 }

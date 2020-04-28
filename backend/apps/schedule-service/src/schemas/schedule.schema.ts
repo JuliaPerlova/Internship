@@ -7,5 +7,6 @@ export const ScheduleSchema = new mongoose.Schema({
     providers: { type: [ProvidersSchema], required: true },
     postId: { type: String, required: true, index: true, unique: true },
     notify: { type: Boolean },
+    startsAt: { type: Date, default: new Date },
     status: { type: String, required: true, enum: Object.values(statusEnum) },
 });

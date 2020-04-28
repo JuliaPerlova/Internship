@@ -7,4 +7,5 @@ export interface ISchedule extends Document {
     readonly postId: string,
     readonly notify: boolean,
     readonly status: string,
+    readonly startsAt: Date,
 }
