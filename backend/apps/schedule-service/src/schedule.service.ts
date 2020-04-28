@@ -31,6 +31,9 @@ export class ScheduleService {
         port: 8040,
       },
     });
+
+
+    
   }
   
   async createSchedule(
@@ -38,6 +41,7 @@ export class ScheduleService {
     template: CreateTemplateDto, 
     date: Date,
   ): Promise<ISchedule> {
+    console.log(date);
 
     const newPost = await this.postService.createPost(createPostDto, template);
     const { _id, uId, providers } = newPost;
@@ -134,11 +138,11 @@ export class ScheduleService {
       return await this.createPost(scheduleId);
     }
 
-    this.agenda.define(scheduleId, async job => {
-      return await this.createPost(scheduleId);
-    })
-    
-    const dateString = date.toString();
-    await this.agenda.create(scheduleId).schedule(dateString).save();
+    this.agenda.define(`${scheduleId}`, async job => {
+      const { scheduleId } = job.attrs.data;
+      await this.createPost(scheduleId);
+    });
+
+    await this.agenda.create(`${scheduleId}`, { scheduleId }).schedule(date).save();
   }
 }
