@@ -12,9 +12,6 @@ import { SocialService } from '../../social-service/src/social.service';
 
 import { ISchedule } from './interfaces/schedule.interface';
 import { statusEnum } from './enums/status.enum';
-import { IPost } from 'post-service/src/interfaces/post.interface';
-import { ISocialReactions } from './interfaces/social-reactions.interface';
-import { ITemplate } from 'post-service/src/interfaces/template.interface';
 
 @Injectable()
 export class ScheduleService {
@@ -97,7 +94,7 @@ export class ScheduleService {
       return await this.apiClient.send<object>(
         { cmd: `${provider} get social reactions`}, 
         { postId, accessToken, asset},
-      );
+      ).toPromise().then((data) => data);
     }));
 
     return [post, template, socialReactions];
@@ -133,14 +130,14 @@ export class ScheduleService {
         return await this.apiClient.send<object>(
           { cmd: `${provider} upload image`}, 
           { attach, providerId, accessToken },
-        ).toPromise().then((data) => data);
+        ).toPromise().then((data) => data).catch((err) => err);
       }));
 
       const link = await this.apiClient.send<object>(
         { cmd: `${provider} create share`},
         { post, providerId, accessToken, links: attachments },
-      ).toPromise().then((data) => data);
-        
+      ).toPromise().then((data) => data).catch((err) => err);
+
       if (!link) {
         this.sendEmail(email, 'fail');
         this.updateSchedule(scheduleId, { status: statusEnum.rejected, notify: true });
@@ -163,7 +160,6 @@ export class ScheduleService {
 
   async publishSchedule(scheduleId, date) {
     if(!date) {
-      console.log(date);
       return await this.createPost(scheduleId);
     }
 
