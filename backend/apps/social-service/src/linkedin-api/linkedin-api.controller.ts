@@ -47,6 +47,21 @@ export class LinkedinApiController {
         });
     }
 
+    @MessagePattern({ cmd: 'linkedin get social reactions' })
+    async getREactions({ providerId, accessToken, asset }) {
+        await fetch(`https://api.linkedin.com/v2/socialActions/${asset}`, {
+            method: 'GET',
+            'Authorization': `Bearer ${accessToken}`
+        }).then(async(res) => {
+            const response = await res.text();
+            const parsed = JSON.parse(response);
+            const comments = parsed.commentsSummary.aggregatedTotalComments;
+            const likes = parsed.likesSummary.totalLikes;
+
+            return { comments, likes };
+        })
+    }
+
     @MessagePattern({ cmd: 'linkedin upload image' })
     async uploadImage({ attach, providerId, accessToken }) {
         const { body, headers } = this.linkedinService.registerImage(providerId, accessToken);
@@ -96,6 +111,7 @@ export class LinkedinApiController {
             const parsed = JSON.parse(data);
             const link = parsed.activity;
             console.log(link);
+            return link;
         }).catch((err) => console.log(err.headers));
 
     }

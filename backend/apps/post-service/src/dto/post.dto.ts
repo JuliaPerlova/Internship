@@ -13,6 +13,7 @@ export class CreatePostDto {
     readonly providers: IProviders;
     
     readonly uId: string;
+    readonly links: Array<string>;
     readonly createdAt: Date;
     readonly updatedAt: Date;
     readonly _id: string;

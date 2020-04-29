@@ -30,7 +30,7 @@ export class PostService {
     return await post.save();
   }
 
-  async updatePost(postId: string, newData: CreatePostDto): Promise<IPost> {
+  async updatePost(postId: string, newData: object): Promise<IPost> {
     return await this.postModel.findByIdAndUpdate(postId, newData, { new: true }).exec();
   }
 

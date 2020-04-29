@@ -53,6 +53,12 @@ export class SocialApiController {
         return this.appService.createConnection(req.user);
     }
 
+    @Post('/social/article')
+    createArticle(@Body() { uId, token }) {
+        return uId;
+    }
+
+
     @Post('/social/profiles')
     getAll(@Body() { uId }) {
         return this.appService.getAll(uId);

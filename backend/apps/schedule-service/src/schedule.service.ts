@@ -12,6 +12,9 @@ import { SocialService } from '../../social-service/src/social.service';
 
 import { ISchedule } from './interfaces/schedule.interface';
 import { statusEnum } from './enums/status.enum';
+import { IPost } from 'post-service/src/interfaces/post.interface';
+import { ISocialReactions } from './interfaces/social-reactions.interface';
+import { ITemplate } from 'post-service/src/interfaces/template.interface';
 
 @Injectable()
 export class ScheduleService {
@@ -75,7 +78,30 @@ export class ScheduleService {
   }
 
   async findUnpublished(uId: string): Promise<ISchedule[]> {
-    return await this.scheduleModel.find({ uId, status: statusEnum.waiting }).exec();
+    const schedules = await this.scheduleModel.find({ uId, status: statusEnum.waiting }).exec();
+    return schedules.map(async(schedule) => { 
+      const post = await this.postService.findOne(schedule.postId);
+      return { schedule, post };
+    })
+  }
+
+  async findPublished(scheduleId: string) {
+    const { postId, providers } = await this.findOne(scheduleId);
+    const [post, template] = await this.postService.findOne(postId);
+
+    const socialReactions = await Promise.all(providers.map(async({ provider, providerId }) => {
+
+      const asset = post.links.filter((link) => link.provider === provider);
+
+      const { accessToken } = await this.socialService.findProfileByPId(provider, providerId);
+      return await this.apiClient.send<object>(
+        { cmd: `${provider} get social reactions`}, 
+        { postId, accessToken, asset},
+      );
+    }));
+
+    return [post, template, socialReactions];
+
   }
 
   async deleteOne(scheduleId: string): Promise<ISchedule> {
@@ -94,17 +120,11 @@ export class ScheduleService {
     }
   }
 
-  private async checkStatus(provider, asset, accessToken) {
-    return await this.apiClient.send<object>(
-      { cmd: `${provider} check status`}, 
-      {asset, accessToken}
-    );
-  }
-
   private async createPost(scheduleId: string) {
     const schedule = await this.findOne(scheduleId);
     const [post, template] = await this.postService.findOne(schedule.postId);
     const { email } = await this.userService.findUser(schedule.uId);
+    const { links } = post; 
 
     Promise.all(schedule.providers.map(async({ provider, providerId }) => {
       const { accessToken } = await this.socialService.findProfileByPId(provider, providerId);
@@ -120,7 +140,14 @@ export class ScheduleService {
         { cmd: `${provider} create share`},
         { post, providerId, accessToken, links: attachments },
       ).toPromise().then((data) => data);
+        
+      if (!link) {
+        this.sendEmail(email, 'fail');
+        this.updateSchedule(scheduleId, { status: statusEnum.rejected, notify: true });
+        throw new RpcException("Post can't be published");
+      }
 
+      links.push({ provider, link: `${link}` });
       return this.sendEmail(email, 'success', link);
     }))
     .catch(() => {
@@ -129,6 +156,7 @@ export class ScheduleService {
       throw new RpcException("Post can't be published");
     });
 
+    await this.postService.updatePost(schedule.postId, { links })
     this.agenda.cancel({ name: scheduleId });
     this.updateSchedule(scheduleId, { status: statusEnum.published, notify: true });
   }
